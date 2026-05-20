@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <!-- 预连接 Google Fonts，提升字体加载速度 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>「戏韵万象」京剧数据可视分析系统</title>
+
+    <style>
+      /* ============================================================
+         🎓【全局重置】
+         去掉所有元素默认内外边距，统一盒模型为 border-box，
+         这是避免布局错乱的基础。
+         ============================================================ */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* ============================================================
+         🎓【页面根元素 - 整体海报画布】
+         整个页面就是一个固定全屏的画布，背景图拉伸填满。
+         我们使用百分比定位把所有模块“贴”在背景图的对应位置上。
+         ============================================================ */
+      body {
+        font-family: 'Microsoft YaHei', sans-serif;
+        background: #3b1d0f; /* 极端情况背景图加载失败时的保护色 */
+        overflow: hidden; /* 禁止出现滚动条，保持海报完整性 */
+        width: 100vw;
+        height: 100vh;
+      }
+
+      /* ============================================================
+         🎓【仪表盘主容器 - 背景图与比例锚点】
+         .dashboard 是整个页面的“坐标原点”，所有绝对定位元素
+         的百分比尺寸和位置都相对于它计算。
+         我们让它的尺寸始终等于浏览器窗口大小（100vw × 100vh），
+         并且背景图强制拉伸填满，这样背景上的装饰（顶部花卉、
+         中部线框、底部水墨）会随窗口同比例缩放。
+         ============================================================ */
+      .dashboard {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        /* 背景图：请确保 bg.png 与 HTML 文件在同一目录下 */
+        background: url('./bg.png') no-repeat center center;
+        background-size: 100% 100%; /* 拉伸填满，与窗口完全贴合 */
+        overflow: hidden;
+        /* 整体色彩微调，保持古风温润感 */
+        filter: saturate(1.1) contrast(1.02) brightness(1.02);
+      }
+
+      /* ============================================================
+         🎓【顶部标题区 - 精确落在顶部装饰图案中央】
+         根据背景描述，顶部装饰区高度约占画面 7%。
+         所以我们让标题容器的高度为 7%，top: 0，
+         标题文字在容器内水平垂直居中，
+         这样标题就恰好位于顶部花卉、脸谱图案的正中间。
+         z-index 确保标题在背景之上可见。
+         ============================================================ */
+      .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 7%; /* 与背景顶部装饰带高度一致 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none; /* 标题不阻挡下方交互（如果需要） */
+        z-index: 20;
+      }
+
+      /* 🎓 标题文字样式：使用草书字体，字号用 vw 单位随窗口宽度缩放 */
+      .header h1 {
+        font-family: 'Ma Shan Zheng', cursive;
+        font-size: calc(
+          2.2vw + 1.8vh
+        ); /* 混合视口单位，保证在不同比例下都清晰 */
+        line-height: 1;
+        color: #7a120d;
+        letter-spacing: 0.5em;
+        font-weight: bold;
+        text-shadow: 0 0.15em 0 rgba(255, 255, 255, 0.9),
+          0 0 1em rgba(255, 255, 255, 0.7), 0 0.4em 0.8em rgba(122, 30, 18, 0.2);
+        white-space: nowrap; /* 防止标题换行 */
+      }
+
+      /* ============================================================
+         🎓【核心内容线框 - 把时间线和图表包裹在一起】
+         根据背景描述，中央大面积浅米黄宣纸区域是核心内容区，
+         水平占 94% (左右各留 3%)，垂直占 86% (上下各留 7%)。
+         但底部还有 20% 的水墨装饰，所以我们调整底部留白为 20%，
+         这样核心内容区垂直方向从 7% 到 80% (高度 73%)。
+         这个 .content-frame 就是背景中那个“线框”的具象化容器，
+         我们给它加上朱红色边框，模拟回纹线框的效果。
+         所有业务模块（时间线、图表）都放在这个线框里面。
+         ============================================================ */
+      .content-frame {
+        position: absolute;
+        /* 水平：左右各 3%，符合背景边框装饰带宽度 */
+        left: 3%;
+        right: 3%;
+        /* 垂直：顶部避开 7% 的标题装饰带，底部避开 20% 的水墨装饰区 */
+        top: 7%;
+        bottom: 20%;
+        /* 模拟背景中的“线框”：朱红色半透明边框，圆角，轻微阴影 */
+        border: 2px solid rgba(180, 70, 50, 0.55);
+        border-radius: 8px;
+        background: rgba(255, 250, 245, 0.1); /* 极淡的宣纸色，不遮挡背景纹理 */
+        box-shadow: inset 0 0 30px rgba(180, 100, 60, 0.08),
+          0 0 0 2px rgba(200, 140, 90, 0.15); /* 内发光+外轮廓，增强线框感 */
+        padding: 1.5% 2% 1.5% 2%; /* 内部留出呼吸空间 */
+        display: flex;
+        flex-direction: column;
+        gap: 1.5%; /* 时间线和下方主体之间的间距 */
+        overflow: hidden;
+        z-index: 10;
+        /* 毛玻璃效果非常轻微，避免遮盖背景纹饰 */
+        backdrop-filter: blur(0.5px);
+      }
+
+      /* ============================================================
+         🎓【时间线板块 - 位于线框内部顶部】
+         它作为 content-frame 的第一个子元素，自动占据顶部位置。
+         使用固定高度比例（相对于父容器高度），保证始终可见。
+         内部采用弹性布局，让时间节点均匀分布。
+         ============================================================ */
+      .timeline {
+        flex-shrink: 0; /* 不会被压缩 */
+        height: 22%; /* 占据线框高度的 22%，保证时间线清晰 */
+        background: rgba(255, 248, 240, 0.35);
+        border-radius: 8px;
+        border: 1px solid rgba(180, 130, 90, 0.25);
+        padding: 1.5% 2%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(90, 40, 20, 0.06);
+      }
+
+      /* 🎓 时间线标题小标签 */
+      .section-title {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(to right, #7e2418, #a3392a);
+        color: white;
+        padding: 0.3em 1em;
+        border-radius: 999px;
+        font-size: clamp(0.7rem, 1vw, 0.9rem); /* 响应式字体 */
+        font-weight: bold;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 8px rgba(120, 30, 20, 0.2);
+        margin-bottom: 1%;
+        width: fit-content;
+      }
+
+      /* 🎓 时间节点容器 */
+      .timeline-items {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        flex: 1;
+        align-items: flex-end; /* 让节点底部对齐在连接线上 */
+        padding-bottom: 8px;
+      }
+
+      /* 🎓 时间连接线 - 伪元素实现 */
+      .timeline-items::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 18px; /* 与节点圆点中心对齐 */
+        height: 3px;
+        border-radius: 10px;
+        background: linear-gradient(
+          to right,
+          rgba(180, 70, 50, 0.15),
+          #b5483d,
+          rgba(180, 70, 50, 0.15)
+        );
+        z-index: 0;
+      }
+
+      /* 🎓 单个时间节点 */
+      .timeline-node {
+        flex: 1; /* 平均分配宽度 */
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+
+      .timeline-node:hover {
+        transform: translateY(-4px);
+      }
+
+      /* 🎓 时间点圆点 */
+      .dot {
+        width: clamp(12px, 1.5vw, 20px);
+        height: clamp(12px, 1.5vw, 20px);
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #b5483d;
+        margin: 0 auto 6px;
+        box-shadow: 0 0 8px rgba(181, 72, 61, 0.3);
+      }
+
+      .timeline-node.active .dot {
+        background: #b5483d;
+        box-shadow: 0 0 14px rgba(181, 72, 61, 0.6);
+      }
+
+      .timeline-node h4 {
+        font-size: clamp(0.6rem, 0.9vw, 0.85rem);
+        margin-bottom: 2px;
+        color: #5a2b1d;
+      }
+
+      .timeline-node p {
+        font-size: clamp(0.5rem, 0.7vw, 0.7rem);
+        color: #8d7b68;
+      }
+
+      /* ============================================================
+         🎓【主体三栏布局 - 占据线框剩余空间】
+         .main 是 flex 子项，flex:1 自动填满时间线下方所有空间。
+         内部使用 Grid 分为左中右三栏，与背景的对称布局呼应。
+         ============================================================ */
+      .main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 28% 44% 28%; /* 中间栏稍宽，放置核心图表 */
+        gap: 1.5%;
+        min-height: 0; /* 防止 flex 子项溢出 */
+      }
+
+      /* 🎓 每列内部垂直排列面板 */
+      .column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5%;
+        min-height: 0;
+      }
+
+      /* ============================================================
+         🎓【面板样式 - 宣纸质感的半透明卡片】
+         所有图表面板都使用相似的半透明背景和轻微模糊，
+         既能透过背景纹理，又保证文字可读性。
+         面板大小通过 .large / .medium 类控制相对比例。
+         ============================================================ */
+      .panel {
+        background: linear-gradient(
+          rgba(255, 250, 245, 0.45),
+          rgba(255, 245, 238, 0.55)
+        );
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(180, 140, 110, 0.2);
+        border-radius: 8px;
+        padding: 2.5% 3%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(80, 40, 20, 0.06);
+      }
+
+      .panel.large {
+        flex: 1; /* 占据列的剩余空间 */
+      }
+
+      .panel.medium {
+        flex: 0 0 48%; /* 固定占据列高的48%，留一点间隙 */
+      }
+
+      /* 🎓 面板内标题适配 */
+      .panel .section-title {
+        margin-bottom: 2%;
+        font-size: clamp(0.65rem, 0.9vw, 0.8rem);
+      }
+
+      /* 🎓 占位图表区域 - 虚线框提示后续接入图表 */
+      .placeholder {
+        flex: 1;
+        border-radius: 8px;
+        border: 1px dashed rgba(180, 140, 100, 0.35);
+        background: rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #9b8b7c;
+        font-size: clamp(0.7rem, 0.9vw, 0.9rem);
+        margin-top: 1%;
+      }
+
+      /* ============================================================
+         🎓【剧本剪影卡片画廊】
+         四个卡片水平排列，均分宽度。
+         ============================================================ */
+      .script-gallery {
+        display: flex;
+        gap: 3%;
+        flex: 1;
+        margin-top: 2%;
+      }
+
+      .script-card {
+        flex: 1;
+        border-radius: 8px;
+        background: linear-gradient(to bottom, #ecd9bf, #dcc1a0);
+        border: 1px solid #cda980;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7b5c3f;
+        font-size: clamp(0.7rem, 0.9vw, 0.9rem);
+        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 4px 10px rgba(80, 40, 20, 0.08);
+        cursor: pointer;
+      }
+
+      .script-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(80, 40, 20, 0.15);
+      }
+
+      /* ============================================================
+         🎓【剧本目录网格卡片】
+         2列网格，展示六大类目。
+         ============================================================ */
+      .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3%;
+        flex: 1;
+        margin-top: 2%;
+      }
+
+      .catalog-card {
+        border-radius: 8px;
+        background: linear-gradient(
+          to bottom,
+          rgba(244, 228, 198, 0.9),
+          rgba(232, 210, 176, 0.95)
+        );
+        border: 1px solid rgba(190, 150, 110, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s, box-shadow 0.25s;
+        box-shadow: 0 2px 5px rgba(80, 40, 20, 0.06);
+        position: relative;
+        cursor: pointer;
+      }
+
+      /* 🎓 卡片顶部装饰小标签，模仿古籍目录 */
+      .catalog-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 12%;
+        width: 25%;
+        height: 8%;
+        background: #d8b27b;
+        border-radius: 0 0 6px 6px;
+      }
+
+      .catalog-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 18px rgba(80, 40, 20, 0.14);
+      }
+
+      .catalog-card h4 {
+        font-size: clamp(0.8rem, 1vw, 1rem);
+        margin-bottom: 4px;
+        color: #6a281d;
+      }
+
+      .catalog-card p {
+        color: #86684d;
+        font-size: clamp(0.7rem, 0.9vw, 0.9rem);
+      }
+
+      /* ============================================================
+         🎓【响应式微调 - 极小屏幕或移动端】
+         当屏幕宽度小于 800px 时，线框内部改为单列布局，
+         并适当调整字体和高度，确保内容可见且不重叠。
+         背景图依旧拉伸，标题、线框位置保持不变。
+         ============================================================ */
+      @media (max-width: 800px) {
+        .content-frame {
+          padding: 2% 3%;
+        }
+
+        .timeline {
+          height: 28%; /* 时间线稍高，保证文字清晰 */
+        }
+
+        .main {
+          grid-template-columns: 1fr; /* 单列堆叠 */
+          gap: 2%;
+        }
+
+        .panel.medium {
+          flex: 0 0 auto;
+          height: 40%;
+        }
+
+        .header h1 {
+          font-size: 6vw;
+          letter-spacing: 0.3em;
+        }
+
+        .timeline-node h4 {
+          font-size: 2.5vw;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 
+      ============================================================
+      🎓【HTML 结构说明】
+      整体采用三层嵌套，对应背景图的三个层级：
+      1. .dashboard (海报画布，背景图)
+      2. ├── .header (顶部标题，落在7%装饰区中央)
+      3. └── .content-frame (核心线框，从7%到80%)
+             ├── .timeline (时间线板块)
+             └── .main (三栏图表布局)
+
+      所有模块都使用百分比定位，随窗口缩放自动对齐背景。
+      ============================================================ 
+    -->
+    <div class="dashboard">
+      <!-- 顶部标题：位于背景顶部图案正中央 -->
+      <header class="header">
+        <h1>「戏韵万象」京剧数据可视分析</h1>
+      </header>
+
+      <!-- 核心内容线框：时间线 + 主体图表都包含在内 -->
+      <div class="content-frame">
+        <!-- 时间线板块 -->
+        <section class="timeline">
+          <div class="section-title">剧本创作时期时间线</div>
+          <div class="timeline-items">
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清乾隆以前</h4>
+              <p>1735年前</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清乾隆时期</h4>
+              <p>1736-1795</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清嘉庆时期</h4>
+              <p>1796-1850</p>
+            </div>
+            <div class="timeline-node active">
+              <div class="dot"></div>
+              <h4>清咸同光时期</h4>
+              <p>1851-1908</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清宣统时期</h4>
+              <p>1909-1911</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>民国时期</h4>
+              <p>1912-1949</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>新中国成立初期</h4>
+              <p>1950-1976</p>
+            </div>
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>改革开放时期</h4>
+              <p>1977-至今</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 主体三栏图表区 -->
+        <section class="main">
+          <!-- 左栏 -->
+          <div class="column">
+            <div class="panel medium">
+              <div class="section-title">剧本剪影</div>
+              <div class="script-gallery">
+                <div class="script-card">剧本图片</div>
+                <div class="script-card">剧本图片</div>
+                <div class="script-card">剧本图片</div>
+                <div class="script-card">剧本图片</div>
+              </div>
+            </div>
+            <div class="panel large">
+              <div class="section-title">角色特征与行当分类</div>
+              <div class="placeholder">
+                桑基图区域<br />（后续接入 ECharts / D3.js）
+              </div>
+            </div>
+          </div>
+
+          <!-- 中栏 -->
+          <div class="column">
+            <div class="panel large">
+              <div class="section-title">剧本人物关系导向图</div>
+              <div class="placeholder">人物关系图 / 词云图 / 情节折线图</div>
+            </div>
+            <div class="panel medium">
+              <div class="section-title">标准化叙事弧线</div>
+              <div class="placeholder">多剧本对比折线图区域</div>
+            </div>
+          </div>
+
+          <!-- 右栏 -->
+          <div class="column">
+            <div class="panel large">
+              <div class="section-title">剧本目录</div>
+              <div class="catalog-grid">
+                <div class="catalog-card">
+                  <h4>忠孝类</h4>
+                  <p>236部</p>
+                </div>
+                <div class="catalog-card">
+                  <h4>爱情类</h4>
+                  <p>189部</p>
+                </div>
+                <div class="catalog-card">
+                  <h4>复仇类</h4>
+                  <p>142部</p>
+                </div>
+                <div class="catalog-card">
+                  <h4>侠义类</h4>
+                  <p>206部</p>
+                </div>
+                <div class="catalog-card">
+                  <h4>历史演义</h4>
+                  <p>315部</p>
+                </div>
+                <div class="catalog-card">
+                  <h4>神话传说</h4>
+                  <p>128部</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel medium">
+              <div class="section-title">主题占比堆叠柱状图</div>
+              <div class="placeholder">堆叠柱状图区域</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

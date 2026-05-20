@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>「戏韵万象」京剧数据可视分析系统</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Microsoft YaHei', sans-serif;
+
+        background: #e8dcc8;
+
+        color: #5a2b1d;
+
+        overflow: auto;
+
+        margin: 0;
+      }
+
+      /* 整体容器 */
+      .dashboard {
+        filter: saturate(1.18) contrast(1.05) brightness(1.03);
+
+        width: 100vw;
+
+        height: 100vh;
+
+        position: relative;
+
+        background: url('./bg.png');
+
+        background-size: 100% 100%;
+
+        background-repeat: no-repeat;
+
+        background-position: center;
+
+        display: flex;
+
+        flex-direction: column;
+
+        overflow: hidden;
+
+        padding: 12px /* 顶部 */ 18px /* 左右 */ 18px; /* 底部 */
+      }
+
+      /* 顶部标题 */
+      .header {
+        position: absolute;
+
+        top: 8px;
+
+        left: 0;
+
+        width: 100%;
+
+        height: 90px;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: center;
+
+        pointer-events: none;
+
+        z-index: 10;
+      }
+
+      .header h1 {
+        font-family: 'Ma Shan Zheng', cursive;
+
+        font-size: 58px;
+
+        line-height: 1;
+
+        color: #7a120d;
+
+        letter-spacing: 10px;
+
+        font-weight: bold;
+
+        margin-top: 2px;
+
+        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.95),
+          0 0 10px rgba(255, 255, 255, 0.85), 0 6px 14px rgba(122, 30, 18, 0.15);
+      }
+
+      /* 公共标题 */
+      .section-title {
+        display: inline-flex;
+
+        align-items: center;
+
+        background: linear-gradient(to right, #7e2418, #c7b9b8);
+
+        color: white;
+
+        padding: 5px 14px;
+
+        border-radius: 999px;
+
+        font-size: 15px;
+
+        font-weight: bold;
+
+        letter-spacing: 1px;
+
+        box-shadow: 0 4px 10px rgba(120, 30, 20, 0.18);
+
+        margin-bottom: 10px;
+      }
+
+      /* 时间线 */
+      .timeline {
+        background: rgba(255, 248, 240, 0.55);
+
+        backdrop-filter: blur(2px);
+
+        border: 1px solid rgba(180, 130, 90, 0.22);
+
+        border-radius: 10px;
+
+        padding: 10px 14px;
+
+        box-shadow: 0 2px 8px rgba(90, 50, 20, 0.04);
+      }
+
+      .timeline-items {
+        display: flex;
+
+        justify-content: space-between;
+
+        position: relative;
+
+        margin-top: 6px;
+      }
+
+      .timeline-items::before {
+        content: '';
+
+        position: absolute;
+
+        top: 24px;
+        left: 0;
+
+        width: 100%;
+        height: 5px;
+
+        border-radius: 10px;
+
+        background: linear-gradient(
+          to right,
+          rgba(180, 70, 50, 0.2),
+          #b5483d,
+          rgba(180, 70, 50, 0.2)
+        );
+      }
+
+      /*单个时间节点*/
+      .timeline-node {
+        width: 120px;
+
+        text-align: center;
+
+        position: relative;
+
+        z-index: 2;
+
+        transition: 0.3s;
+      }
+      /*悬停效果*/
+      .timeline-node:hover {
+        transform: translateY(-4px);
+      }
+
+      .dot {
+        width: 20px;
+        height: 20px;
+
+        border-radius: 50%;
+
+        background: white;
+
+        border: 4px solid #b5483d;
+
+        margin: 0 auto 10px;
+
+        box-shadow: 0 0 10px rgba(181, 72, 61, 0.25);
+      }
+
+      .timeline-node.active .dot {
+        background: #b5483d;
+
+        box-shadow: 0 0 16px rgba(181, 72, 61, 0.5);
+      }
+
+      .timeline-node h4 {
+        font-size: 14px;
+
+        margin-bottom: 4px;
+      }
+
+      .timeline-node p {
+        font-size: 12px;
+
+        color: #8d7b68;
+      }
+
+      /* 主体布局 */
+      .main {
+        position: absolute;
+
+        top: 150px;
+
+        left: 18px;
+
+        right: 18px;
+
+        bottom: 18px;
+
+        display: grid;
+
+        grid-template-columns:
+          27%
+          46%
+          27%;
+
+        gap: 12px;
+      }
+
+      .column {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 8px;
+      }
+
+      /* 面板 */
+      .panel {
+        background: linear-gradient(
+          rgba(255, 250, 245, 0.38),
+          rgba(255, 248, 242, 0.48)
+        );
+
+        backdrop-filter: blur(1px);
+
+        border: 1px solid rgba(160, 120, 80, 0.12);
+
+        border-radius: 10px;
+
+        padding: 10px;
+
+        overflow: hidden;
+      }
+
+      .panel.large {
+        flex: 1;
+      }
+
+      .panel.medium {
+        height: 300px;
+      }
+
+      /* 占位图表 */
+      .placeholder {
+        width: 100%;
+
+        height: calc(100% - 42px);
+
+        border-radius: 10px;
+
+        border: 1px dashed rgba(180, 140, 100, 0.28);
+
+        background: rgba(255, 255, 255, 0.18);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        text-align: center;
+
+        color: #9b8b7c;
+
+        font-size: 15px;
+
+        margin-top: 8px;
+      }
+
+      /* 剧本剪影 */
+      .script-gallery {
+        display: flex;
+
+        gap: 10px;
+
+        margin-top: 8px;
+      }
+
+      .script-card {
+        flex: 1;
+
+        height: 190px;
+
+        border-radius: 10px;
+
+        background: linear-gradient(to bottom, #ecd9bf, #dcc1a0);
+
+        border: 1px solid #cda980;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        color: #7b5c3f;
+
+        font-size: 14px;
+
+        transition: 0.3s;
+
+        box-shadow: 0 4px 10px rgba(80, 40, 20, 0.08);
+      }
+
+      .script-card:hover {
+        transform: translateY(-5px);
+
+        box-shadow: 0 10px 20px rgba(80, 40, 20, 0.12);
+      }
+
+      /* 目录卡片 */
+      .catalog-grid {
+        display: grid;
+
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 10px;
+
+        margin-top: 6px;
+      }
+
+      .catalog-card {
+        height: 88px;
+
+        border-radius: 8px;
+
+        background: linear-gradient(
+          to bottom,
+          rgba(244, 228, 198, 0.92),
+          rgba(232, 210, 176, 0.95)
+        );
+
+        border: 1px solid rgba(190, 150, 110, 0.35);
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        transition: 0.25s;
+
+        box-shadow: 0 2px 5px rgba(80, 40, 20, 0.05);
+
+        position: relative;
+      }
+
+      .catalog-card::before {
+        content: '';
+
+        position: absolute;
+
+        top: 0;
+
+        left: 12px;
+
+        width: 36px;
+
+        height: 10px;
+
+        background: #d8b27b;
+
+        border-radius: 0 0 6px 6px;
+      }
+
+      .catalog-card:hover {
+        transform: scale(1.03);
+
+        box-shadow: 0 8px 18px rgba(80, 40, 20, 0.12);
+      }
+
+      .catalog-card h4 {
+        font-size: 16px;
+
+        margin-bottom: 6px;
+
+        color: #6a281d;
+      }
+
+      .catalog-card p {
+        color: #86684d;
+
+        font-size: 14px;
+      }
+
+      /* 响应式 */
+      @media (max-width: 1200px) {
+        body {
+          overflow: auto;
+        }
+
+        .main {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 28px;
+        }
+
+        .timeline-items {
+          overflow-x: auto;
+
+          gap: 24px;
+
+          padding-bottom: 10px;
+        }
+
+        .timeline-node {
+          min-width: 120px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <!-- 顶部标题 -->
+      <header class="header">
+        <h1>「戏韵万象」京剧数据可视分析</h1>
+      </header>
+
+      <!-- 时间线 -->
+      <section class="timeline">
+        <div class="section-title">剧本创作时期时间线</div>
+
+        <div class="timeline-items">
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>清乾隆以前</h4>
+            <p>1735年前</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>清乾隆时期</h4>
+            <p>1736-1795</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>清嘉庆时期</h4>
+            <p>1796-1850</p>
+          </div>
+
+          <div class="timeline-node active">
+            <div class="dot"></div>
+            <h4>清咸同光时期</h4>
+            <p>1851-1908</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>清宣统时期</h4>
+            <p>1909-1911</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>民国时期</h4>
+            <p>1912-1949</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>新中国成立初期</h4>
+            <p>1950-1976</p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="dot"></div>
+            <h4>改革开放时期</h4>
+            <p>1977-至今</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 主体 -->
+      <section class="main">
+        <!-- 左侧 -->
+        <div class="column">
+          <div class="panel medium">
+            <div class="section-title">剧本剪影</div>
+
+            <div class="script-gallery">
+              <div class="script-card">剧本图片</div>
+              <div class="script-card">剧本图片</div>
+              <div class="script-card">剧本图片</div>
+              <div class="script-card">剧本图片</div>
+            </div>
+          </div>
+
+          <div class="panel large">
+            <div class="section-title">角色特征与行当分类</div>
+
+            <div class="placeholder">
+              桑基图区域<br />
+              （后续接入 ECharts / D3.js）
+            </div>
+          </div>
+        </div>
+
+        <!-- 中间 -->
+        <div class="column">
+          <div class="panel large">
+            <div class="section-title">剧本人物关系导向图</div>
+
+            <div class="placeholder">人物关系图 / 词云图 / 情节折线图</div>
+          </div>
+
+          <div class="panel medium">
+            <div class="section-title">标准化叙事弧线</div>
+
+            <div class="placeholder">多剧本对比折线图区域</div>
+          </div>
+        </div>
+
+        <!-- 右侧 -->
+        <div class="column">
+          <div class="panel large">
+            <div class="section-title">剧本目录</div>
+
+            <div class="catalog-grid">
+              <div class="catalog-card">
+                <h4>忠孝类</h4>
+                <p>236部</p>
+              </div>
+
+              <div class="catalog-card">
+                <h4>爱情类</h4>
+                <p>189部</p>
+              </div>
+
+              <div class="catalog-card">
+                <h4>复仇类</h4>
+                <p>142部</p>
+              </div>
+
+              <div class="catalog-card">
+                <h4>侠义类</h4>
+                <p>206部</p>
+              </div>
+
+              <div class="catalog-card">
+                <h4>历史演义</h4>
+                <p>315部</p>
+              </div>
+
+              <div class="catalog-card">
+                <h4>神话传说</h4>
+                <p>128部</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel medium">
+            <div class="section-title">主题占比堆叠柱状图</div>
+
+            <div class="placeholder">堆叠柱状图区域</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
