@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>「戏韵万象」京剧数据可视分析系统</title>
+
+    <!-- 毛笔字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        font-family: 'Microsoft YaHei', sans-serif;
+
+        background: #120807;
+      }
+
+      /* =========================
+       外层
+      ========================= */
+      .screen-wrapper {
+        width: 100vw;
+        height: 100vh;
+
+        overflow: hidden;
+
+        position: relative;
+      }
+
+      /* =========================
+       主页面
+       ========================= */
+      .dashboard {
+        width: 1920px;
+        height: 1080px;
+
+        position: absolute;
+
+        left: 50%;
+        top: 50%;
+
+        transform-origin: center center;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        padding: 12px 18px 5px;
+
+        background: url('./assets/bg.png');
+
+        background-size: cover;
+
+        background-position: center;
+
+        background-repeat: no-repeat;
+
+        filter: saturate(1.12) contrast(1.04);
+
+        transition: transform 0.25s ease;
+      }
+
+      /* =========================
+       页面暗纹
+      ========================= */
+      .dashboard::before {
+        content: '';
+
+        position: absolute;
+
+        inset: 0;
+
+        background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.18));
+
+        pointer-events: none;
+      }
+
+      /* =========================
+       标题
+      ========================= */
+      .header {
+        position: absolute;
+
+        top: 8px;
+
+        left: 0;
+
+        width: 100%;
+
+        display: flex;
+
+        justify-content: center;
+
+        z-index: 10;
+
+        pointer-events: none;
+      }
+
+      .header h1 {
+        font-family: 'Ma Shan Zheng', cursive;
+
+        font-size: 58px;
+
+        line-height: 1;
+
+        color: #7a120d;
+
+        letter-spacing: 10px;
+
+        font-weight: bold;
+
+        margin-top: 2px;
+
+        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.95),
+          0 0 10px rgba(255, 255, 255, 0.85), 0 6px 14px rgba(122, 30, 18, 0.15);
+      }
+
+      /* =========================
+       公共标题
+      ========================= */
+      .section-title {
+        display: inline-flex;
+
+        align-items: center;
+
+        background: linear-gradient(to right, #7e2418, #c7b9b8);
+
+        color: white;
+
+        padding: 5px 14px;
+
+        border-radius: 999px;
+
+        font-size: 15px;
+
+        font-weight: bold;
+
+        letter-spacing: 1px;
+
+        box-shadow: 0 4px 10px rgba(120, 30, 20, 0.18);
+
+        margin-bottom: 10px;
+      }
+
+      /* =========================
+       时间线（重点优化）
+      ========================= */
+      .timeline {
+        margin-top: 65px;
+
+        background: linear-gradient(
+          rgba(60, 20, 15, 0.42),
+          rgba(40, 10, 10, 0.38)
+        );
+
+        backdrop-filter: blur(6px);
+
+        border: 1px solid rgba(255, 210, 150, 0.16);
+
+        border-radius: 16px;
+
+        padding: 14px 20px;
+
+        box-shadow: 0 0 25px rgba(120, 30, 20, 0.18),
+          inset 0 0 20px rgba(255, 220, 180, 0.04);
+
+        position: relative;
+
+        overflow: hidden;
+      }
+
+      /* 时间线顶部暖光 */
+      .timeline::before {
+        content: '';
+
+        position: absolute;
+
+        top: -60px;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        width: 700px;
+        height: 160px;
+
+        background: radial-gradient(
+          ellipse,
+          rgba(255, 210, 120, 0.18),
+          transparent 70%
+        );
+
+        pointer-events: none;
+      }
+
+      .timeline-items {
+        display: flex;
+
+        justify-content: space-between;
+
+        position: relative;
+
+        margin-top: 10px;
+      }
+
+      /* 主时间线 */
+      .timeline-items::before {
+        content: '';
+
+        position: absolute;
+
+        top: 26px;
+        left: 0;
+
+        width: 100%;
+        height: 6px;
+
+        border-radius: 999px;
+
+        background: linear-gradient(
+          to right,
+          rgba(255, 210, 120, 0.12),
+          rgba(214, 82, 56, 0.95),
+          rgba(255, 210, 120, 0.12)
+        );
+
+        box-shadow: 0 0 14px rgba(214, 82, 56, 0.4);
+      }
+
+      .timeline-node {
+        width: 120px;
+
+        text-align: center;
+
+        position: relative;
+
+        z-index: 2;
+
+        transition: 0.3s;
+      }
+
+      .timeline-node:hover {
+        transform: translateY(-6px) scale(1.03);
+      }
+
+      /* 时间节点 */
+      .dot {
+        width: 22px;
+        height: 22px;
+
+        border-radius: 50%;
+
+        background: radial-gradient(circle, #ffe3a8 0%, #d07b45 70%);
+
+        border: 3px solid rgba(120, 20, 10, 0.9);
+
+        margin: 0 auto 12px;
+
+        transition: 0.3s;
+
+        box-shadow: 0 0 10px rgba(255, 180, 80, 0.4),
+          0 0 22px rgba(181, 72, 61, 0.35);
+      }
+
+      /* 激活节点 */
+      .timeline-node.active .dot {
+        transform: scale(1.18);
+
+        background: radial-gradient(
+          circle,
+          #fff1c9 0%,
+          #ffb347 55%,
+          #b5483d 100%
+        );
+
+        box-shadow: 0 0 12px rgba(255, 220, 120, 0.9),
+          0 0 28px rgba(255, 140, 60, 0.65), 0 0 42px rgba(181, 72, 61, 0.45);
+      }
+
+      /* 朝代文字 */
+      .timeline-node h4 {
+        font-size: 15px;
+
+        font-weight: bold;
+
+        margin-bottom: 5px;
+
+        color: #ffe7b8;
+
+        letter-spacing: 1px;
+
+        text-shadow: 0 0 6px rgba(255, 220, 120, 0.4),
+          0 2px 4px rgba(0, 0, 0, 0.65);
+      }
+
+      /* 时间范围 */
+      .timeline-node p {
+        font-size: 12px;
+
+        color: #f1d2b4;
+
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      /* =========================
+       主体布局
+      ========================= */
+      .main {
+        flex: 1;
+
+        display: grid;
+
+        width: 100%;
+
+        grid-template-columns:
+          26%
+          46.5%
+          26%;
+
+        gap: 12px;
+
+        margin-top: 7px;
+
+        min-height: 0;
+      }
+
+      .column {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 8px;
+      }
+
+      /* =========================
+       面板
+      ========================= */
+      .panel {
+        background: linear-gradient(
+          rgba(255, 250, 245, 0.38),
+          rgba(255, 248, 242, 0.48)
+        );
+
+        backdrop-filter: blur(1px);
+
+        border: 1px solid rgba(160, 120, 80, 0.12);
+
+        border-radius: 10px;
+
+        padding: 10px;
+
+        overflow: hidden;
+
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .panel.large {
+        flex: 1;
+      }
+
+      .panel.medium {
+        height: 300px;
+      }
+
+      /* =========================
+       占位区域
+      ========================= */
+      .placeholder {
+        width: 100%;
+
+        height: calc(100% - 42px);
+
+        border-radius: 10px;
+
+        border: 1px dashed rgba(180, 140, 100, 0.28);
+
+        background: rgba(255, 255, 255, 0.18);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        text-align: center;
+
+        color: #9b8b7c;
+
+        font-size: 15px;
+
+        margin-top: 8px;
+      }
+
+      /* =========================
+       剧本剪影
+      ========================= */
+      .script-gallery {
+        display: flex;
+
+        gap: 10px;
+
+        margin-top: 8px;
+      }
+
+      .script-card {
+        flex: 1;
+
+        height: 190px;
+
+        border-radius: 10px;
+
+        background: linear-gradient(to bottom, #ecd9bf, #dcc1a0);
+
+        border: 1px solid #cda980;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        color: #7b5c3f;
+
+        font-size: 14px;
+
+        transition: 0.3s;
+
+        box-shadow: 0 4px 10px rgba(80, 40, 20, 0.08);
+      }
+
+      .script-card:hover {
+        transform: translateY(-5px);
+
+        box-shadow: 0 10px 20px rgba(80, 40, 20, 0.12);
+      }
+
+      /* =========================
+       目录卡片
+      ========================= */
+      .catalog-grid {
+        display: grid;
+
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 10px;
+
+        margin-top: 6px;
+      }
+
+      .catalog-card {
+        height: 88px;
+
+        border-radius: 8px;
+
+        background: linear-gradient(
+          to bottom,
+          rgba(244, 228, 198, 0.92),
+          rgba(232, 210, 176, 0.95)
+        );
+
+        border: 1px solid rgba(190, 150, 110, 0.35);
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        transition: 0.25s;
+
+        position: relative;
+      }
+
+      .catalog-card::before {
+        content: '';
+
+        position: absolute;
+
+        top: 0;
+
+        left: 12px;
+
+        width: 36px;
+
+        height: 10px;
+
+        background: #d8b27b;
+
+        border-radius: 0 0 6px 6px;
+      }
+
+      .catalog-card:hover {
+        transform: scale(1.03);
+
+        box-shadow: 0 8px 18px rgba(80, 40, 20, 0.12);
+      }
+
+      .catalog-card h4 {
+        font-size: 16px;
+
+        margin-bottom: 6px;
+
+        color: #6a281d;
+      }
+
+      .catalog-card p {
+        color: #86684d;
+
+        font-size: 14px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="screen-wrapper">
+      <div class="dashboard">
+        <!-- 顶部标题 -->
+        <header class="header">
+          <h1>「戏韵万象」京剧数据可视分析</h1>
+        </header>
+
+        <!-- 时间线 -->
+        <section class="timeline">
+          <div class="section-title">剧本创作时期时间线</div>
+
+          <div class="timeline-items">
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清乾隆以前</h4>
+              <p>1735年前</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清乾隆时期</h4>
+              <p>1736-1795</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清嘉庆时期</h4>
+              <p>1796-1850</p>
+            </div>
+
+            <div class="timeline-node active">
+              <div class="dot"></div>
+              <h4>清咸同光时期</h4>
+              <p>1851-1908</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>清宣统时期</h4>
+              <p>1909-1911</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>民国时期</h4>
+              <p>1912-1948</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>新中国成立初期</h4>
+              <p>1949-1977</p>
+            </div>
+
+            <div class="timeline-node">
+              <div class="dot"></div>
+              <h4>改革开放时期</h4>
+              <p>1978 -至今</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 主体 -->
+        <section class="main">
+          <!-- 左 -->
+          <div class="column">
+            <div class="panel medium">
+              <div class="section-title">剧本剪影</div>
+
+              <div class="script-gallery">
+                <div class="script-card">剧本图片</div>
+
+                <div class="script-card">剧本图片</div>
+
+                <div class="script-card">剧本图片</div>
+
+                <div class="script-card">剧本图片</div>
+              </div>
+            </div>
+
+            <div class="panel large">
+              <div class="section-title">角色特征与行当分类</div>
+
+              <div class="placeholder">桑基图区域</div>
+            </div>
+          </div>
+
+          <!-- 中 -->
+          <div class="column">
+            <div class="panel large">
+              <div class="section-title">剧本人物关系导向图</div>
+
+              <div class="placeholder">人物关系图 / 词云图 / 情节折线图</div>
+            </div>
+
+            <div class="panel medium">
+              <div class="section-title">标准化叙事弧线</div>
+
+              <div class="placeholder">多剧本对比折线图区域</div>
+            </div>
+          </div>
+
+          <!-- 右 -->
+          <div class="column">
+            <div class="panel medium">
+              <div class="section-title">剧本目录</div>
+
+              <div class="catalog-grid">
+                <div class="catalog-card">
+                  <h4>忠孝类</h4>
+                  <p>236部</p>
+                </div>
+
+                <div class="catalog-card">
+                  <h4>爱情类</h4>
+                  <p>189部</p>
+                </div>
+
+                <div class="catalog-card">
+                  <h4>复仇类</h4>
+                  <p>142部</p>
+                </div>
+
+                <div class="catalog-card">
+                  <h4>侠义类</h4>
+                  <p>206部</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel large">
+              <div class="section-title">主题占比堆叠柱状图</div>
+
+              <div class="placeholder">堆叠柱状图区域</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      function scaleScreen() {
+        const dashboard = document.querySelector('.dashboard')
+
+        const designWidth = 1920
+        const designHeight = 1080
+
+        const scaleX = window.innerWidth / designWidth
+
+        const scaleY = window.innerHeight / designHeight
+
+        const scale = Math.min(scaleX, scaleY)
+
+        dashboard.style.transform = `translate(-50%, -50%) scale(${scale})`
+      }
+
+      window.addEventListener('resize', scaleScreen)
+
+      scaleScreen()
+    </script>
+  </body>
+</html>
