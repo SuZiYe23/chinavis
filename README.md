@@ -2,7 +2,7 @@
 
 这是一个面向京剧剧本文本的静态数据可视分析项目。页面基于 `数据可视化大作业/index.html` 原始大屏模板改造，使用仓库内 `data/` 目录的全量 JSON 数据驱动，不依赖后端服务。
 
-GitHub Pages 入口（启用后）：<https://SuZiYe23.github.io/chinavis/>
+在线访问入口：<https://SuZiYe23.github.io/chinavis/>
 
 ## 当前数据规模
 
@@ -76,25 +76,6 @@ python3 -m http.server 8765
 
 ```text
 http://127.0.0.1:8765/
-```
-
-## GitHub Pages 发布
-
-仓库已经包含静态页面、完整数据和 `.github/workflows/pages.yml`。如 Pages 地址还未生效，需要仓库管理员在 GitHub 仓库设置中启用 Pages：
-
-```text
-Settings → Pages → Build and deployment
-```
-
-可选择以下任一方式：
-
-1. `Deploy from a branch`：选择 `gh-pages` 分支，目录选择 `/ (root)`。
-2. `GitHub Actions`：使用仓库中的 `Deploy GitHub Pages` workflow。
-
-启用后访问：
-
-```text
-https://SuZiYe23.github.io/chinavis/
 ```
 
 ## 数据质量说明
