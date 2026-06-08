@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="戏韵万象 — 京剧数据可视分析系统，探索1473部京剧剧目的角色行当、人物关系、主题结构与叙事演化" />
+
+    <link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
+
+    <title>戏韵万象 · 京剧数据可视分析系统</title>
+
+    <!-- 字体 -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+XiaoWei&family=Zhi+Mang+Xing&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <link rel="stylesheet" href="./css/timeline.css" />
+
+    <link rel="stylesheet" href="./css/overview.css" />
+
+    <link rel="stylesheet" href="./css/opera.css" />
+
+    <link rel="stylesheet" href="./css/compare.css" />
+  </head>
+
+  <body>
+    <div class="screen-wrapper">
+      <div class="dashboard">
+        <!-- ========================= -->
+        <!-- 标题 -->
+        <!-- ========================= -->
+
+        <header class="header">
+          <button class="back-btn header-back-btn" data-back="overviewPage">← 返回总览</button>
+          <h1>「戏韵万象」京剧数据可视分析</h1>
+        </header>
+
+        <!-- ========================= -->
+        <!-- 整体预览（含时间轴） -->
+        <!-- ========================= -->
+
+        <section id="overviewPage" class="page active-page">
+
+          <!-- 时间轴（仅整体预览页面可见） -->
+
+          <section class="timeline">
+            <div class="timeline-items">
+              <div class="timeline-node active" data-dynasty="全部">
+                <div class="dot"></div>
+                <h4>全部</h4>
+                <p>全剧目</p>
+              </div>
+              <div class="timeline-node" data-dynasty="春秋战国">
+                <div class="dot"></div>
+                <h4>春秋战国</h4>
+                <p>前770—前221</p>
+              </div>
+              <div class="timeline-node" data-dynasty="秦汉">
+                <div class="dot"></div>
+                <h4>秦汉</h4>
+                <p>前221—220</p>
+              </div>
+              <div class="timeline-node" data-dynasty="三国两晋">
+                <div class="dot"></div>
+                <h4>三国两晋</h4>
+                <p>220—420</p>
+              </div>
+              <div class="timeline-node" data-dynasty="隋唐五代">
+                <div class="dot"></div>
+                <h4>隋唐五代</h4>
+                <p>581—960</p>
+              </div>
+              <div class="timeline-node" data-dynasty="宋">
+                <div class="dot"></div>
+                <h4>宋</h4>
+                <p>960—1279</p>
+              </div>
+              <div class="timeline-node" data-dynasty="元">
+                <div class="dot"></div>
+                <h4>元</h4>
+                <p>1271—1368</p>
+              </div>
+              <div class="timeline-node" data-dynasty="明">
+                <div class="dot"></div>
+                <h4>明</h4>
+                <p>1368—1644</p>
+              </div>
+              <div class="timeline-node" data-dynasty="清">
+                <div class="dot"></div>
+                <h4>清</h4>
+                <p>1644—1912</p>
+              </div>
+              <div class="timeline-node" data-dynasty="近现代">
+                <div class="dot"></div>
+                <h4>近现代</h4>
+                <p>1912—至今</p>
+              </div>
+              <div class="timeline-node" data-dynasty="未识别">
+                <div class="dot"></div>
+                <h4>未识别</h4>
+                <p>未分类</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="main overview-main">
+            <!-- 左侧 -->
+
+            <div class="column">
+              <!-- 核心指标 -->
+
+              <div class="panel medium">
+                <div class="section-title">分析导航</div>
+
+                <div class="summary-grid nav-card-grid">
+                  <div class="summary-card nav-sub-btn" data-page="sankeyPage">
+                    <img src="./images/nav-sankey.svg" class="nav-icon" alt="行当分析" />
+                    <p>行当分析</p>
+                  </div>
+
+                  <div class="summary-card nav-sub-btn" data-page="networkPage">
+                    <img src="./images/nav-network.svg" class="nav-icon" alt="角色关系" />
+                    <p>角色关系</p>
+                  </div>
+
+                  <div class="summary-card nav-sub-btn" data-page="sunburstPage">
+                    <img src="./images/nav-sunburst.svg" class="nav-icon" alt="主题结构" />
+                    <p>主题结构</p>
+                  </div>
+
+                  <div class="summary-card nav-sub-btn" data-page="overviewAnalysisPage">
+                    <img src="./images/nav-analysis.svg" class="nav-icon" alt="综合分析" />
+                    <p>综合分析</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 桑基图 -->
+
+              <div class="panel large sankey-panel">
+                <div class="section-title">角色特征与行当分类</div>
+
+                <div id="roleSankeyChart" class="chart-box"></div>
+              </div>
+            </div>
+
+            <!-- 中间 -->
+
+            <div class="column">
+              <!-- 剧本索引网格 -->
+
+              <div class="panel large">
+                <div class="panel-header-row">
+                  <div class="section-title">剧本索引</div>
+
+                  <div class="index-search-box">
+                    <input id="indexSearchInput" type="text" placeholder="搜索剧目名称..." />
+                  </div>
+                </div>
+
+                <div class="opera-index-wrapper">
+                  <div id="operaIndexGrid" class="opera-index-grid"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右侧 -->
+
+            <div class="column">
+              <!-- 剧种面积堆叠图 -->
+
+              <div class="panel medium">
+                <div class="section-title">剧种面积堆叠</div>
+
+                <div id="typeAreaChart" class="chart-box"></div>
+              </div>
+
+              <!-- 主题词云 -->
+
+              <div class="panel large">
+                <div class="section-title">主题词云</div>
+
+                <div id="themeCloud" class="chart-box"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ========================= -->
+        <!-- 具体剧目 -->
+        <!-- ========================= -->
+
+        <section id="operaPage" class="page">
+          <div class="subpage-container">
+            <section class="main opera-main">
+            <!-- ============ 左侧 24% ============ -->
+
+            <div class="column">
+              <!-- 左上：剧本整体预览卡 -->
+
+              <div class="panel medium opera-overview-panel">
+                <div class="section-title">剧本预览</div>
+
+                <div id="operaOverviewCard" class="opera-overview-card"></div>
+              </div>
+
+              <!-- 左下：角色表 -->
+
+              <div class="panel large">
+                <div class="section-title">角色列表</div>
+
+                <div id="operaRoleTable" class="opera-role-table-wrap"></div>
+              </div>
+            </div>
+
+            <!-- ============ 中间 52% ============ -->
+
+            <div class="column opera-mid-col">
+              <!-- 人物关系力导向图 -->
+
+              <div class="panel large">
+                <div class="section-title">人物关系图</div>
+
+                <div id="operaRelationGraph" class="chart-box"></div>
+              </div>
+
+              <!-- 情节走势双折线 -->
+
+              <div class="panel medium">
+                <div class="section-title">情节走势</div>
+
+                <div id="storylineChart" class="chart-box"></div>
+              </div>
+            </div>
+
+            <!-- ============ 右侧 24% ============ -->
+
+            <div class="column">
+              <!-- 右上：主题词云 -->
+
+              <div class="panel medium">
+                <div class="section-title">主题词云</div>
+
+                <div id="operaThemeCloud" class="chart-box"></div>
+              </div>
+
+              <!-- 右下：叙事事件列表 -->
+
+              <div class="panel large">
+                <div class="section-title">叙事事件</div>
+
+                <div id="storyEventList" class="story-event-list"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ========================= -->
+        <!-- 多维关联分析 → 拆分为4个子页面 -->
+        <!-- ========================= -->
+
+        
+        <!-- ========================= -->
+        <!-- 行当分析（子页1） -->
+        <!-- ========================= -->
+        <section id="sankeyPage" class="page">
+          <div class="subpage-container">
+                    <section class="timeline">
+            <div class="timeline-items">
+              <div class="timeline-node active" data-dynasty="全部">
+                <div class="dot"></div>
+                <h4>全部</h4>
+                <p>全剧目</p>
+              </div>
+              <div class="timeline-node" data-dynasty="春秋战国">
+                <div class="dot"></div>
+                <h4>春秋战国</h4>
+                <p>前770—前221</p>
+              </div>
+              <div class="timeline-node" data-dynasty="秦汉">
+                <div class="dot"></div>
+                <h4>秦汉</h4>
+                <p>前221—220</p>
+              </div>
+              <div class="timeline-node" data-dynasty="三国两晋">
+                <div class="dot"></div>
+                <h4>三国两晋</h4>
+                <p>220—420</p>
+              </div>
+              <div class="timeline-node" data-dynasty="隋唐五代">
+                <div class="dot"></div>
+                <h4>隋唐五代</h4>
+                <p>581—960</p>
+              </div>
+              <div class="timeline-node" data-dynasty="宋">
+                <div class="dot"></div>
+                <h4>宋</h4>
+                <p>960—1279</p>
+              </div>
+              <div class="timeline-node" data-dynasty="元">
+                <div class="dot"></div>
+                <h4>元</h4>
+                <p>1271—1368</p>
+              </div>
+              <div class="timeline-node" data-dynasty="明">
+                <div class="dot"></div>
+                <h4>明</h4>
+                <p>1368—1644</p>
+              </div>
+              <div class="timeline-node" data-dynasty="清">
+                <div class="dot"></div>
+                <h4>清</h4>
+                <p>1644—1912</p>
+              </div>
+              <div class="timeline-node" data-dynasty="近现代">
+                <div class="dot"></div>
+                <h4>近现代</h4>
+                <p>1912—至今</p>
+              </div>
+              <div class="timeline-node" data-dynasty="未识别">
+                <div class="dot"></div>
+                <h4>未识别</h4>
+                <p>未分类</p>
+              </div>
+            </div>
+          </section>
+          <div class="sankey-layout">
+              <div class="sankey-left">
+                <div id="sankeyCompare" class="chart-container-full"></div>
+              </div>
+              <div class="sankey-right">
+                <div class="panel sankey-right-panel">
+                  <div class="section-title" style="margin-bottom:6px;">行当统计</div>
+                  <div id="sankeyStats" class="sankey-stats-box"></div>
+                </div>
+                <div class="panel sankey-right-panel">
+                  <div class="section-title" style="margin-bottom:6px;">演化趋势</div>
+                  <div id="sankeyTrend" class="sankey-trend-box"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================= -->
+        <!-- 角色关系（子页2） -->
+        <!-- ========================= -->
+        <section id="networkPage" class="page">
+          <div class="subpage-container">
+                    <section class="timeline">
+            <div class="timeline-items">
+              <div class="timeline-node active" data-dynasty="全部">
+                <div class="dot"></div>
+                <h4>全部</h4>
+                <p>全剧目</p>
+              </div>
+              <div class="timeline-node" data-dynasty="春秋战国">
+                <div class="dot"></div>
+                <h4>春秋战国</h4>
+                <p>前770—前221</p>
+              </div>
+              <div class="timeline-node" data-dynasty="秦汉">
+                <div class="dot"></div>
+                <h4>秦汉</h4>
+                <p>前221—220</p>
+              </div>
+              <div class="timeline-node" data-dynasty="三国两晋">
+                <div class="dot"></div>
+                <h4>三国两晋</h4>
+                <p>220—420</p>
+              </div>
+              <div class="timeline-node" data-dynasty="隋唐五代">
+                <div class="dot"></div>
+                <h4>隋唐五代</h4>
+                <p>581—960</p>
+              </div>
+              <div class="timeline-node" data-dynasty="宋">
+                <div class="dot"></div>
+                <h4>宋</h4>
+                <p>960—1279</p>
+              </div>
+              <div class="timeline-node" data-dynasty="元">
+                <div class="dot"></div>
+                <h4>元</h4>
+                <p>1271—1368</p>
+              </div>
+              <div class="timeline-node" data-dynasty="明">
+                <div class="dot"></div>
+                <h4>明</h4>
+                <p>1368—1644</p>
+              </div>
+              <div class="timeline-node" data-dynasty="清">
+                <div class="dot"></div>
+                <h4>清</h4>
+                <p>1644—1912</p>
+              </div>
+              <div class="timeline-node" data-dynasty="近现代">
+                <div class="dot"></div>
+                <h4>近现代</h4>
+                <p>1912—至今</p>
+              </div>
+              <div class="timeline-node" data-dynasty="未识别">
+                <div class="dot"></div>
+                <h4>未识别</h4>
+                <p>未分类</p>
+              </div>
+            </div>
+          </section>
+          <div class="network-top-row">
+              <div class="network-controls" style="padding:0 0 4px 16px;gap:10px;justify-content:flex-start;">
+                <select id="networkTypeFilter"><option value="全部">全部剧种</option></select>
+              </div>
+              <span id="currentOperaLabel" class="network-opera-name">—</span>
+            </div>
+            <div class="network-layout">
+              <div class="network-left">
+                <div class="network-chart-area">
+                  <div id="relationNetwork" class="chart-container-full"></div>
+                  <button id="prevOperaBtn" class="nav-float-btn nav-float-prev">‹</button>
+                  <button id="nextOperaBtn" class="nav-float-btn nav-float-next">›</button>
+                </div>
+                <div id="networkMetrics" class="network-metrics"></div>
+              </div>
+              <div class="network-right" id="networkRightPanel">
+                <div class="nr-full">
+                  <div class="nr-tab-row">
+                    <button class="nr-tab active" data-dim="structure">网络结构维度</button>
+                    <button class="nr-tab" data-dim="role">角色维度</button>
+                    <button class="nr-tab" data-dim="relation">关系维度</button>
+                  </div>
+                  <div id="nrChart" class="nr-chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================= -->
+        <!-- 主题结构（子页3） -->
+        <!-- ========================= -->
+        <section id="sunburstPage" class="page">
+          <div class="subpage-container">
+                    <section class="timeline">
+            <div class="timeline-items">
+              <div class="timeline-node active" data-dynasty="全部">
+                <div class="dot"></div>
+                <h4>全部</h4>
+                <p>全剧目</p>
+              </div>
+              <div class="timeline-node" data-dynasty="春秋战国">
+                <div class="dot"></div>
+                <h4>春秋战国</h4>
+                <p>前770—前221</p>
+              </div>
+              <div class="timeline-node" data-dynasty="秦汉">
+                <div class="dot"></div>
+                <h4>秦汉</h4>
+                <p>前221—220</p>
+              </div>
+              <div class="timeline-node" data-dynasty="三国两晋">
+                <div class="dot"></div>
+                <h4>三国两晋</h4>
+                <p>220—420</p>
+              </div>
+              <div class="timeline-node" data-dynasty="隋唐五代">
+                <div class="dot"></div>
+                <h4>隋唐五代</h4>
+                <p>581—960</p>
+              </div>
+              <div class="timeline-node" data-dynasty="宋">
+                <div class="dot"></div>
+                <h4>宋</h4>
+                <p>960—1279</p>
+              </div>
+              <div class="timeline-node" data-dynasty="元">
+                <div class="dot"></div>
+                <h4>元</h4>
+                <p>1271—1368</p>
+              </div>
+              <div class="timeline-node" data-dynasty="明">
+                <div class="dot"></div>
+                <h4>明</h4>
+                <p>1368—1644</p>
+              </div>
+              <div class="timeline-node" data-dynasty="清">
+                <div class="dot"></div>
+                <h4>清</h4>
+                <p>1644—1912</p>
+              </div>
+              <div class="timeline-node" data-dynasty="近现代">
+                <div class="dot"></div>
+                <h4>近现代</h4>
+                <p>1912—至今</p>
+              </div>
+              <div class="timeline-node" data-dynasty="未识别">
+                <div class="dot"></div>
+                <h4>未识别</h4>
+                <p>未分类</p>
+              </div>
+            </div>
+          </section>
+          <div class="sunburst-layout-full" style="flex:1;min-height:0;">
+              <div id="themeSunburst" class="chart-container-full"></div>
+              <div id="themeTopCombos" class="combo-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================= -->
+        <!-- 综合分析（子页4） -->
+        <!-- ========================= -->
+        <section id="overviewAnalysisPage" class="page">
+          <div class="subpage-container">
+                    <section class="timeline">
+            <div class="timeline-items">
+              <div class="timeline-node active" data-dynasty="全部">
+                <div class="dot"></div>
+                <h4>全部</h4>
+                <p>全剧目</p>
+              </div>
+              <div class="timeline-node" data-dynasty="春秋战国">
+                <div class="dot"></div>
+                <h4>春秋战国</h4>
+                <p>前770—前221</p>
+              </div>
+              <div class="timeline-node" data-dynasty="秦汉">
+                <div class="dot"></div>
+                <h4>秦汉</h4>
+                <p>前221—220</p>
+              </div>
+              <div class="timeline-node" data-dynasty="三国两晋">
+                <div class="dot"></div>
+                <h4>三国两晋</h4>
+                <p>220—420</p>
+              </div>
+              <div class="timeline-node" data-dynasty="隋唐五代">
+                <div class="dot"></div>
+                <h4>隋唐五代</h4>
+                <p>581—960</p>
+              </div>
+              <div class="timeline-node" data-dynasty="宋">
+                <div class="dot"></div>
+                <h4>宋</h4>
+                <p>960—1279</p>
+              </div>
+              <div class="timeline-node" data-dynasty="元">
+                <div class="dot"></div>
+                <h4>元</h4>
+                <p>1271—1368</p>
+              </div>
+              <div class="timeline-node" data-dynasty="明">
+                <div class="dot"></div>
+                <h4>明</h4>
+                <p>1368—1644</p>
+              </div>
+              <div class="timeline-node" data-dynasty="清">
+                <div class="dot"></div>
+                <h4>清</h4>
+                <p>1644—1912</p>
+              </div>
+              <div class="timeline-node" data-dynasty="近现代">
+                <div class="dot"></div>
+                <h4>近现代</h4>
+                <p>1912—至今</p>
+              </div>
+              <div class="timeline-node" data-dynasty="未识别">
+                <div class="dot"></div>
+                <h4>未识别</h4>
+                <p>未分类</p>
+              </div>
+            </div>
+          </section>
+          <div class="analysis-grid-new">
+              <div class="ana-panel ana-panel-wide">
+                <div class="section-title" style="margin-bottom:6px;">三者联动 · 角色关系 × 主题表达 × 叙事结构</div>
+                <div id="anaBubble" class="ana-chart"></div>
+              </div>
+              <div class="ana-panel">
+                <div class="ana-switch-row">
+                  <button class="ana-switch active" data-anamode="stage">主题×叙事阶段</button>
+                  <button class="ana-switch" data-anamode="relation">主题×关系类型</button>
+                </div>
+                <div id="anaThemeStage" class="ana-chart"></div>
+              </div>
+              <div class="ana-panel">
+                <div class="section-title" style="margin-bottom:6px;">关系情绪 × 叙事演化</div>
+                <div id="anaEmotion" class="ana-chart"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        </section>
+
+        <script src="./data-js/opera_basic.js"></script>
+        <script src="./data-js/opera_compact.js"></script>
+        <script src="./data-js/opera_relations.js"></script>
+        <script src="./data-js/opera_roles.js"></script>
+        <script src="./data-js/opera_storyline.js"></script>
+        <script src="./data-js/opera_themes.js"></script>
+        <script src="./data-js/summary.js"></script>
+
+        <!-- ========================= -->
+        <!-- ECharts -->
+        <!-- ========================= -->
+
+        <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+        <!-- WordCloud -->
+
+        <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud/dist/echarts-wordcloud.min.js"></script>
+
+        <!-- ========================= -->
+        <!-- 主程序（按依赖顺序加载） -->
+        <!-- ========================= -->
+
+        <script src="./js/dataLoader.js"></script>
+        <script src="./js/utils.js"></script>
+        <script src="./js/chartTheme.js"></script>
+        <script src="./js/charts/sankeyChart.js"></script>
+        <script src="./js/charts/sankeyCompare.js"></script>
+        <script src="./js/charts/relationNetwork.js"></script>
+        <script src="./js/charts/themeSunburst.js"></script>
+        <script src="./js/charts/comprehensiveAnalysis.js"></script>
+        <script src="./js/main.js"></script>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,580 @@
+/* ========================================= */
+/* 具体剧目 */
+/* 国风数字人文增强版 */
+/* ========================================= */
+
+.opera-overview-panel{
+  height:300px;
+  flex-shrink:0;
+}
+
+/* ========================================= */
+/* 剧目概览卡 */
+/* ========================================= */
+
+.overview-card-header{
+
+  position:relative;
+
+  background:linear-gradient(
+      135deg,
+      rgba(255,240,220,0.16),
+      rgba(255,220,180,0.10)
+  );
+
+  backdrop-filter:blur(10px);
+
+  border:1px solid rgba(255,220,180,0.12);
+
+  border-radius:14px;
+
+  padding:10px 14px;
+
+  margin-bottom:12px;
+
+  overflow:hidden;
+
+  box-shadow:
+      0 4px 18px rgba(0,0,0,0.08);
+}
+
+.overview-card-header::after{
+
+  content:'';
+
+  position:absolute;
+
+  top:-30px;
+  right:-30px;
+
+  width:90px;
+  height:90px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,220,120,0.14),
+      transparent 70%
+    );
+
+  pointer-events:none;
+}
+
+.overview-card-header .opera-name{
+
+  font-family:var(--font-display);
+
+  font-size:34px;
+
+  color:#fff0d0;
+
+  letter-spacing:3px;
+
+  text-shadow:
+    0 2px 6px rgba(0,0,0,0.35);
+
+  margin-bottom:6px;
+}
+
+/* 标签 */
+
+.overview-card-header .opera-tags{
+
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+}
+
+.overview-card-header .opera-tags span{
+
+  padding:4px 12px;
+
+  border-radius:999px;
+
+  background:rgba(255,220,180,0.10);
+
+  border:1px solid rgba(255,220,180,0.10);
+
+  color:#ffd89c;
+
+  font-size:13px;
+}
+
+/* ========================================= */
+/* 基础信息 */
+/* ========================================= */
+
+.overview-card-body{
+
+  padding:0 2px;
+}
+
+.overview-card-body .info-row{
+
+  display:flex;
+
+  margin-bottom:8px;
+
+  font-size:14px;
+
+  line-height:1.6;
+}
+
+.overview-card-body .info-row .label{
+
+  width:80px;
+
+  flex-shrink:0;
+
+  color:#d6b08f;
+
+  font-weight:700;
+
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.overview-card-body .info-row .value{
+
+  color:#fff1d8;
+
+  flex:1;
+
+  font-family:'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ========================================= */
+/* 关键词 */
+/* ========================================= */
+
+.keyword-tags{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:4px;
+}
+
+.keyword-tag{
+
+  padding:3px 10px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(255,220,180,0.08);
+
+  color:#ffd89c;
+
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+
+  font-size:12px;
+  transition:all var(--transition);
+}
+
+.keyword-tag:hover{
+
+  background:rgba(255,220,180,0.10);
+
+  transform:translateY(-1px);
+}
+
+/* ========================================= */
+/* 角色表 */
+/* ========================================= */
+
+.opera-role-table-wrap{
+
+  overflow-y:auto;
+
+  flex:1;
+
+  min-height:0;
+
+  padding-right:4px;
+}
+
+.opera-role-table-wrap table{
+
+  width:100%;
+
+  border-collapse:separate;
+  border-spacing:0;
+
+  font-size:12px;
+
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.opera-role-table-wrap thead{
+
+  position:sticky;
+
+  top:0;
+
+  z-index:2;
+}
+
+.opera-role-table-wrap th{
+
+  background:linear-gradient(
+      135deg,
+      #7a120d,
+      #9F2B25
+  );
+
+  color:#fff7e6;
+
+  padding:8px 5px;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  letter-spacing:1px;
+
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.opera-role-table-wrap th:first-child{
+  border-radius:7px 0 0 0;
+}
+
+.opera-role-table-wrap th:last-child{
+  border-radius:0 7px 0 0;
+}
+
+.opera-role-table-wrap td{
+
+  padding:9px 5px;
+
+  text-align:center;
+
+  color:#f5e4ce;
+
+  background:rgba(255,255,255,0.04);
+
+  border-bottom:1px solid rgba(255,220,180,0.08);
+
+  transition:all var(--transition);
+
+  font-size:12px;
+  line-height:1.5;
+}
+
+.opera-role-table-wrap td:first-child{
+  text-align:left;
+  font-weight:600;
+  color:#ffdca2;
+  font-family:'Ma Shan Zheng', 'STKaiti', serif;
+  font-size:14px;
+  letter-spacing:.5px;
+}
+
+.opera-role-table-wrap .col-personality{
+  font-size:12px;
+  line-height:1.5;
+  color:rgba(245,228,206,0.75);
+}
+
+.opera-role-table-wrap tr:nth-child(even) td{
+
+  background:rgba(255,255,255,0.02);
+}
+
+.opera-role-table-wrap tr:hover td{
+
+  background:rgba(255,220,180,0.1);
+}
+
+.opera-role-table-wrap tr:last-child td:first-child{
+  border-radius:0 0 0 7px;
+}
+
+.opera-role-table-wrap tr:last-child td:last-child{
+  border-radius:0 0 7px 0;
+}
+
+/* 行当标签 */
+
+.role-type-tag{
+
+  display:inline-block;
+
+  padding:3px 10px;
+
+  border-radius:999px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  color:#fff7e6;
+  letter-spacing:1px;
+  font-family:'Ma Shan Zheng', 'STKaiti', serif;
+}
+
+/* 重要度条 */
+
+.imp-bar-bg{
+
+  display:inline-block;
+
+  width:50px;
+
+  height:5px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,0.08);
+
+  overflow:hidden;
+
+  vertical-align:middle;
+}
+
+.imp-bar-fill{
+
+  height:100%;
+
+  border-radius:999px;
+
+  background:linear-gradient(
+      90deg,
+      #c9852a,
+      #ffd27f
+  );
+  box-shadow:0 0 6px rgba(255,180,80,0.25);
+}
+
+.col-importance{
+  white-space:nowrap;
+}
+
+.imp-num{
+  display:inline-block;
+  width:22px;
+  text-align:right;
+  font-size:11px;
+  color:rgba(255,220,180,0.65);
+  vertical-align:middle;
+  margin-left:4px;
+  font-family:'Noto Serif SC', serif;
+}
+
+/* ========================================= */
+/* 图表 */
+/* ========================================= */
+
+#storylineChart,
+#operaThemeCloud{
+
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+
+/* ========================================= */
+/* 叙事事件列表 */
+/* ========================================= */
+
+.story-event-list{
+
+  overflow-y:auto;
+
+  flex:1;
+
+  min-height:0;
+
+  padding-right:4px;
+}
+
+.story-event-item{
+
+  display:flex;
+
+  gap:10px;
+
+  padding:12px 14px;
+
+  margin-bottom:8px;
+
+  border-radius:12px;
+
+  background:rgba(255,255,255,0.04);
+
+  border-left:3px solid var(--amber);
+
+  backdrop-filter:blur(8px);
+
+  transition:all var(--transition);
+}
+
+.story-event-item:hover{
+
+  background:rgba(255,220,180,0.1);
+  transform:translateX(3px);
+  border-left-color:#ffd27f;
+}
+
+.story-event-item .event-timeline-dot{
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  gap:2px;
+
+  min-width:20px;
+
+  flex-shrink:0;
+
+  padding-top:2px;
+}
+
+.story-event-item .event-timeline-dot .dot-circle{
+
+  width:12px;
+  height:12px;
+
+  border-radius:50%;
+
+  border:2px solid var(--amber);
+
+  background:rgba(255,220,180,0.12);
+
+  transition:all var(--transition);
+}
+
+.story-event-item:hover .dot-circle{
+  border-color:#ffd27f;
+  background:rgba(255,220,120,0.25);
+  box-shadow:0 0 8px rgba(255,200,100,0.3);
+}
+
+.story-event-item .event-timeline-dot .dot-line{
+
+  width:2px;
+
+  flex:1;
+
+  min-height:14px;
+
+  background:rgba(255,220,180,0.12);
+
+  border-radius:999px;
+}
+
+.story-event-item .event-body{
+
+  flex:1;
+
+  min-width:0;
+}
+
+.story-event-item .event-stage-row{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  margin-bottom:5px;
+}
+
+/* 阶段标签 */
+
+.story-event-item .event-stage-badge{
+
+  padding:3px 12px;
+
+  border-radius:999px;
+
+  background:linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary-light)
+  );
+
+  color:#fff7e6;
+
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:1px;
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.story-event-item .event-emotion-type{
+
+  color:#d6b08f;
+
+  font-size:12px;
+  font-family:'Ma Shan Zheng', 'STKaiti', serif;
+  letter-spacing:.5px;
+}
+
+.story-event-item .event-desc{
+
+  font-size:13px;
+
+  color:#fff1d8;
+
+  line-height:1.7;
+
+  margin-bottom:6px;
+  font-family:'Noto Serif SC', 'Source Han Serif SC', serif;
+}
+
+.story-event-item .event-metrics{
+
+  display:flex;
+
+  gap:16px;
+
+  font-size:12px;
+
+  color:rgba(214,176,143,0.8);
+}
+
+/* 冲突值 */
+
+.conflict-bar-bg{
+
+  width:44px;
+
+  height:5px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,0.08);
+
+  overflow:hidden;
+
+  display:inline-block;
+
+  vertical-align:middle;
+}
+
+.conflict-bar-fill{
+
+  height:100%;
+
+  border-radius:999px;
+
+  background:linear-gradient(
+      90deg,
+      #c9703a,
+      #c0392b
+  );
+  box-shadow:0 0 6px rgba(200,80,50,0.3);
+}
+
+
+
+

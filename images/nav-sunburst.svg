@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- 主题结构 — 净角额心火焰纹（三叉对称） -->
+  <!-- 底环 -->
+  <circle cx="30" cy="30" r="26" stroke="#f2d9ba" stroke-width="2.5" fill="none" opacity="0.4"/>
+  <!-- 火焰三叉 -->
+  <path d="M30 4l-8 20 6-4 2 14 2-14 6 4z" stroke="#f2d9ba" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+  <!-- 内焰 -->
+  <path d="M30 10l-4 12 3-2 1 8 1-8 3 2z" stroke="#ffd27f" stroke-width="2" fill="none" stroke-linejoin="round"/>
+  <!-- 眉心点 -->
+  <circle cx="30" cy="26" r="3" fill="#ffd27f"/>
+</svg>

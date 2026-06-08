@@ -1,0 +1,195 @@
+/* =========================================
+   Overview
+========================================= */
+
+.panel-header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.panel-header-row .section-title{
+  margin-bottom:0;
+  flex-shrink:0;
+}
+
+/* =========================================
+   搜索框
+========================================= */
+
+.index-search-box input{
+  width:220px;
+  height:34px;
+  border:1px solid rgba(201,133,42,.2);
+  outline:none;
+  border-radius:999px;
+  padding:0 16px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(6px);
+  color:#e8d5b8;
+  font-size:13px;
+  transition:.3s;
+}
+
+.index-search-box input:focus{
+  border-color:#C9852A;
+  box-shadow:0 0 0 4px rgba(201,133,42,.1);
+}
+
+.index-search-box input::placeholder{
+  color:rgba(232,213,184,.4);
+}
+
+/* =========================================
+   剧本索引区域
+========================================= */
+
+.opera-index-wrapper{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding-right:6px;
+}
+
+.opera-index-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  padding-top:6px;
+}
+
+/* =========================================
+   剧本卡片
+========================================= */
+
+.opera-index-tile{
+  background:linear-gradient(145deg, rgba(35,16,12,.5), rgba(25,10,8,.4));
+  backdrop-filter:blur(8px);
+  border-radius:12px;
+  padding:14px 8px 12px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .3s ease;
+  border:1px solid rgba(255,220,180,.1);
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+}
+
+/* 顶部装饰条 */
+.opera-index-tile::before{
+  content:'';
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:3px;
+  background:linear-gradient(90deg, #9F2B25, #C9852A);
+  opacity:.7;
+}
+
+/* Hover */
+.opera-index-tile:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,220,180,.22);
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+
+/* 当前选中 */
+.opera-index-tile.selected{
+  border-color:#C9852A;
+  background:linear-gradient(180deg, rgba(201,133,42,.1), rgba(35,16,12,.5));
+  box-shadow:0 0 0 1.5px rgba(201,133,42,.25), 0 12px 30px rgba(0,0,0,.2);
+}
+
+.opera-index-tile.selected::before{
+  background:linear-gradient(90deg, #C9852A, #ffd27f);
+  height:3px;
+  opacity:1;
+}
+
+/* =========================================
+   剧目名称
+========================================= */
+
+.opera-index-tile .tile-name{
+  font-size:13px;
+  font-weight:700;
+  color:#f2d9ba;
+  margin-bottom:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.4;
+  font-family:var(--font-serif);
+}
+
+/* =========================================
+   朝代
+========================================= */
+
+.opera-index-tile .tile-meta{
+  font-size:12px;
+  color:rgba(196,168,130,.6);
+  margin-bottom:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* =========================================
+   剧种标签
+========================================= */
+
+.opera-index-tile .tile-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px 12px;
+  border-radius:999px;
+  background:rgba(201,133,42,.1);
+  border:1px solid rgba(201,133,42,.15);
+  color:#dca055;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+/* =========================================
+   空状态
+========================================= */
+
+.opera-index-empty{
+  grid-column:1 / -1;
+  text-align:center;
+  padding:60px 0;
+  color:rgba(196,168,130,.4);
+  font-size:15px;
+  font-family:var(--font-display);
+}
+
+/* =========================================
+   滚动条
+========================================= */
+
+.opera-index-wrapper::-webkit-scrollbar{
+  width:6px;
+}
+
+.opera-index-wrapper::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.opera-index-wrapper::-webkit-scrollbar-thumb{
+  background:rgba(159,43,37,.18);
+  border-radius:999px;
+}
+
+.opera-index-wrapper::-webkit-scrollbar-thumb:hover{
+  background:rgba(159,43,37,.32);
+}
+
+
+
+

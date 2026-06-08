@@ -1,0 +1,443 @@
+window.__DATA_summary = 
+{
+  "generated_at": "2026-05-31 13:16:09 +0000",
+  "dataset": {
+    "opera_count": 1473,
+    "json_counts": {
+      "opera_storyline.json": 1473,
+      "opera_relations.json": 1473,
+      "opera_themes.json": 1473,
+      "opera_roles.json": 1473,
+      "opera_basic.json": 1473
+    },
+    "role_total": 21628,
+    "relation_total": 20172,
+    "event_total": 12014,
+    "zip_file": "cleaned_opera_data_opera_zip_llm_primary.zip",
+    "zip_size_bytes": 3359069
+  },
+  "quality": {
+    "weak_problem_count": 0,
+    "pseudo_role_count": 0,
+    "zip_bad_entry": null
+  },
+  "distributions": {
+    "dynasty": [
+      {
+        "name": "明代",
+        "value": 482
+      },
+      {
+        "name": "元代",
+        "value": 341
+      },
+      {
+        "name": "唐代",
+        "value": 308
+      },
+      {
+        "name": "宋代",
+        "value": 212
+      },
+      {
+        "name": "清代",
+        "value": 45
+      },
+      {
+        "name": "未识别",
+        "value": 31
+      },
+      {
+        "name": "汉代",
+        "value": 7
+      },
+      {
+        "name": "南宋",
+        "value": 3
+      },
+      {
+        "name": "战国",
+        "value": 3
+      },
+      {
+        "name": "五代",
+        "value": 3
+      }
+    ],
+    "opera_type": [
+      {
+        "name": "历史戏",
+        "value": 907
+      },
+      {
+        "name": "武戏",
+        "value": 171
+      },
+      {
+        "name": "神怪戏",
+        "value": 133
+      },
+      {
+        "name": "爱情戏",
+        "value": 86
+      },
+      {
+        "name": "家庭伦理戏",
+        "value": 51
+      },
+      {
+        "name": "公案戏",
+        "value": 46
+      },
+      {
+        "name": "京剧",
+        "value": 20
+      },
+      {
+        "name": "历史武戏",
+        "value": 18
+      },
+      {
+        "name": "神怪历史戏",
+        "value": 4
+      },
+      {
+        "name": "传奇戏",
+        "value": 3
+      }
+    ],
+    "role_type": [
+      {
+        "name": "老生",
+        "value": 3769
+      },
+      {
+        "name": "丑",
+        "value": 3766
+      },
+      {
+        "name": "武生",
+        "value": 3404
+      },
+      {
+        "name": "净",
+        "value": 2437
+      },
+      {
+        "name": "外",
+        "value": 2137
+      },
+      {
+        "name": "末",
+        "value": 1948
+      },
+      {
+        "name": "小生",
+        "value": 1354
+      },
+      {
+        "name": "青衣",
+        "value": 1160
+      },
+      {
+        "name": "花旦",
+        "value": 1014
+      },
+      {
+        "name": "老旦",
+        "value": 639
+      }
+    ],
+    "gender": [
+      {
+        "name": "男",
+        "value": 18295
+      },
+      {
+        "name": "女",
+        "value": 3078
+      },
+      {
+        "name": "未知",
+        "value": 255
+      }
+    ],
+    "identity": [
+      {
+        "name": "将领",
+        "value": 496
+      },
+      {
+        "name": "太监",
+        "value": 174
+      },
+      {
+        "name": "未识别",
+        "value": 162
+      },
+      {
+        "name": "丫鬟",
+        "value": 152
+      },
+      {
+        "name": "报子",
+        "value": 132
+      },
+      {
+        "name": "将军",
+        "value": 109
+      },
+      {
+        "name": "丞相",
+        "value": 100
+      },
+      {
+        "name": "家院",
+        "value": 93
+      },
+      {
+        "name": "军师",
+        "value": 84
+      },
+      {
+        "name": "武将",
+        "value": 83
+      },
+      {
+        "name": "衙役",
+        "value": 82
+      },
+      {
+        "name": "东吴将领",
+        "value": 78
+      }
+    ],
+    "theme_type": [
+      {
+        "name": "人物品格",
+        "value": 3236.06
+      },
+      {
+        "name": "人物关系",
+        "value": 2642.65
+      },
+      {
+        "name": "家庭伦理",
+        "value": 2218.02
+      },
+      {
+        "name": "情感主题",
+        "value": 2075.65
+      },
+      {
+        "name": "情节主题",
+        "value": 1765.14
+      },
+      {
+        "name": "战争",
+        "value": 1652.28
+      },
+      {
+        "name": "伦理",
+        "value": 1640.22
+      },
+      {
+        "name": "亲情",
+        "value": 1422.33
+      },
+      {
+        "name": "家国忠义",
+        "value": 1246.24
+      },
+      {
+        "name": "冲突",
+        "value": 1201.11
+      },
+      {
+        "name": "忠义",
+        "value": 1196.31
+      },
+      {
+        "name": "伦理主题",
+        "value": 884.32
+      }
+    ],
+    "theme_keywords": [
+      {
+        "name": "忠义",
+        "value": 33847.0
+      },
+      {
+        "name": "复仇",
+        "value": 7607.0
+      },
+      {
+        "name": "权谋",
+        "value": 6042.0
+      },
+      {
+        "name": "孝道",
+        "value": 5756.0
+      },
+      {
+        "name": "忠勇",
+        "value": 4450.0
+      },
+      {
+        "name": "忠奸对立",
+        "value": 4420.0
+      },
+      {
+        "name": "报仇",
+        "value": 4231.0
+      },
+      {
+        "name": "冤案",
+        "value": 3693.0
+      },
+      {
+        "name": "忠孝",
+        "value": 3302.0
+      },
+      {
+        "name": "报恩",
+        "value": 3108.0
+      },
+      {
+        "name": "冤屈",
+        "value": 3024.0
+      },
+      {
+        "name": "团圆",
+        "value": 3022.0
+      },
+      {
+        "name": "忠君报国",
+        "value": 2929.0
+      },
+      {
+        "name": "姻缘",
+        "value": 2779.0
+      },
+      {
+        "name": "报仇雪恨",
+        "value": 2666.0
+      },
+      {
+        "name": "忠谏",
+        "value": 2658.0
+      },
+      {
+        "name": "忠贞",
+        "value": 2563.0
+      },
+      {
+        "name": "离别",
+        "value": 2457.0
+      },
+      {
+        "name": "忠烈",
+        "value": 2350.0
+      },
+      {
+        "name": "因果报应",
+        "value": 2297.0
+      }
+    ]
+  },
+  "samples": [
+    {
+      "opera_name": "空城计",
+      "dynasty": "元代",
+      "opera_type": "历史戏",
+      "main_roles": [
+        "诸葛亮",
+        "马谡",
+        "司马懿",
+        "王平",
+        "赵云"
+      ],
+      "role_count": 14,
+      "relation_count": 6,
+      "event_count": 6,
+      "theme_keywords": [
+        "空城计",
+        "失守街亭",
+        "谨慎用兵",
+        "赏罚分明",
+        "忠勇"
+      ]
+    },
+    {
+      "opera_name": "乌盆计",
+      "dynasty": "宋代",
+      "opera_type": "公案戏",
+      "main_roles": [
+        "包拯",
+        "张别古",
+        "刘世昌",
+        "赵大",
+        "二衙役"
+      ],
+      "role_count": 5,
+      "relation_count": 7,
+      "event_count": 10,
+      "theme_keywords": [
+        "冤案",
+        "伸冤",
+        "冤魂",
+        "贪财害命",
+        "报应",
+        "断案"
+      ]
+    },
+    {
+      "opera_name": "卖绒花",
+      "dynasty": "清代",
+      "opera_type": "爱情戏",
+      "main_roles": [
+        "崔华",
+        "二小姐",
+        "院子",
+        "县令",
+        "邓文焕"
+      ],
+      "role_count": 5,
+      "relation_count": 6,
+      "event_count": 8,
+      "theme_keywords": [
+        "婚约",
+        "赖婚",
+        "审案",
+        "二小姐",
+        "邓文焕",
+        "不愿意"
+      ]
+    },
+    {
+      "opera_name": "十八扯",
+      "dynasty": "唐代",
+      "opera_type": "历史戏",
+      "main_roles": [
+        "孔怀",
+        "孔凤英"
+      ],
+      "role_count": 2,
+      "relation_count": 1,
+      "event_count": 6,
+      "theme_keywords": [
+        "亲情",
+        "嬉闹",
+        "扮戏",
+        "兄妹",
+        "劝阻",
+        "机智"
+      ]
+    }
+  ],
+  "links": {
+    "kongchengji_charts": "../charts/kongchengji/index.html",
+    "data_dir": "../data/"
+  }
+}
+;
