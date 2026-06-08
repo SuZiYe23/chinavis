@@ -27,6 +27,28 @@ function loadAllData () {
     DataStore.operaCompact = (window.__DATA_opera_compact || [])
     DataStore.summary = (window.__DATA_summary || {})
     if (DataStore.operaBasic.length > 0) DataStore.currentOpera = DataStore.operaBasic[0].opera_name
+
+    /* 预计算角色分类字段（避免每次查询时重复正则匹配） */
+    for (var i = 0; i < DataStore.operaRoles.length; i++) {
+      var roles = DataStore.operaRoles[i].roles
+      if (!Array.isArray(roles)) continue
+      for (var j = 0; j < roles.length; j++) {
+        var role = roles[j]
+        if (!role._precomputed) {
+          role._identityCat = classifyIdentityV2(role.identity)
+          role._personalityCat = classifyPersonalityV2(role.personality)
+          var rawAge = role.age_stage || '未知'
+          if (rawAge.indexOf('幼') >= 0 || rawAge.indexOf('童') >= 0 || rawAge.indexOf('少年') >= 0) role._ageCat = '年龄:少年'
+          else if (rawAge.indexOf('青年') >= 0) role._ageCat = '年龄:青年'
+          else if (rawAge.indexOf('中老年') >= 0 || rawAge.indexOf('老年') >= 0 || rawAge.indexOf('老') >= 0) role._ageCat = '年龄:老年'
+          else if (rawAge.indexOf('中年') >= 0 || rawAge.indexOf('中') >= 0) role._ageCat = '年龄:中年'
+          else role._ageCat = '年龄:未知'
+          var perf = role.performance_type || []
+          role._perfCat = perf.length === 0 ? '表演:无' : '表演:' + ['唱','念','做','打'].filter(function(p) { return perf.indexOf(p) >= 0 }).join('')
+          role._precomputed = true
+        }
+      }
+    }
   } catch (error) {
     console.error('数据加载失败', error)
   }
@@ -270,8 +292,16 @@ function classifyPersonalityV2 (list) {
    排除性别"未知"的角色
 ========================================= */
 
-function getSankeyData(selectedDynasty) {
+var _sankeyDataCache = {}
+
+function getSankeyData(selectedDynasty, dims) {
   if (selectedDynasty === undefined) selectedDynasty = '全部'
+  if (!dims || !dims.length) dims = ['性别','年龄','身份','性格','表演','行当']
+
+  /* 检查缓存（全维度才缓存，部分维度不缓存避免膨胀） */
+  var cacheKey = selectedDynasty + '|' + dims.join(',')
+  var useCache = dims.length >= 6
+  if (useCache && _sankeyDataCache[cacheKey]) return _sankeyDataCache[cacheKey]
 
   var nodeSet = {}
   var linksMap = {}
@@ -285,7 +315,18 @@ function getSankeyData(selectedDynasty) {
     linksMap[key].value++
   }
 
-  DataStore.operaRoles.forEach(function(opera) {
+  var OPERATORS = {
+    '性别': function(role) { return role.gender === '男' ? '性别:男性' : role.gender === '女' ? '性别:女性' : '性别:未知' },
+    '年龄': function(role) { return role._ageCat || '年龄:未知' },
+    '身份': function(role) { return role._identityCat || classifyIdentityV2(role.identity) },
+    '性格': function(role) { return role._personalityCat || classifyPersonalityV2(role.personality) },
+    '表演': function(role) { return role._perfCat || '表演:无' },
+    '行当': function(role) { return '行当:' + (role.role_type || '未知') }
+  }
+
+  var operas = DataStore.operaRoles
+  for (var oi = 0; oi < operas.length; oi++) {
+    var opera = operas[oi]
     if (selectedDynasty !== '全部' && selectedDynasty) {
       var matches = DYNASTY_MAP[selectedDynasty] || []
       var dynastyMatch = false
@@ -296,41 +337,33 @@ function getSankeyData(selectedDynasty) {
           if (opera.dynasty && opera.dynasty.indexOf(matches[mi]) >= 0) { dynastyMatch = true; break }
         }
       }
-      if (!dynastyMatch) return
+      if (!dynastyMatch) continue
     }
 
-    if (!Array.isArray(opera.roles)) return
+    if (!Array.isArray(opera.roles)) continue
+    var roles = opera.roles
 
-    opera.roles.forEach(function(role) {
-      var gender = role.gender === '男' ? '性别:男性' : role.gender === '女' ? '性别:女性' : '性别:未知'
+    for (var ri = 0; ri < roles.length; ri++) {
+      var role = roles[ri]
+      /* 按选中维度生成链：相邻维度间各加一条链接 */
+      for (var di = 0; di < dims.length - 1; di++) {
+        var srcFn = OPERATORS[dims[di]]
+        var tgtFn = OPERATORS[dims[di + 1]]
+        if (srcFn && tgtFn) {
+          addLink(srcFn(role), tgtFn(role))
+        }
+      }
+    }
+  }
 
-      var rawAge = role.age_stage || '未知'
-      var age
-      if (rawAge.indexOf('幼') >= 0 || rawAge.indexOf('童') >= 0 || rawAge.indexOf('少年') >= 0) age = '年龄:少年'
-      else if (rawAge.indexOf('青年') >= 0) age = '年龄:青年'
-      else if (rawAge.indexOf('中老年') >= 0 || rawAge.indexOf('老年') >= 0 || rawAge.indexOf('老') >= 0) age = '年龄:老年'
-      else if (rawAge.indexOf('中年') >= 0 || rawAge.indexOf('中') >= 0) age = '年龄:中年'
-      else age = '年龄:未知'
+  var result = { nodes: Object.keys(nodeSet).map(function(name) { return { name: name } }), links: Object.values(linksMap) }
+  if (useCache) _sankeyDataCache[cacheKey] = result
+  return result
+}
 
-      var identity = classifyIdentityV2(role.identity)
-      var personality = classifyPersonalityV2(role.personality)
-
-      var perf = role.performance_type || []
-      var performance
-      if (perf.length === 0) performance = '表演:无'
-      else performance = '表演:' + ['唱','念','做','打'].filter(function(p) { return perf.indexOf(p) >= 0 }).join('')
-
-      var roleType = '行当:' + (role.role_type || '未知')
-
-      addLink(gender, age)
-      addLink(age, identity)
-      addLink(identity, personality)
-      addLink(personality, performance)
-      addLink(performance, roleType)
-    })
-  })
-
-  return { nodes: Object.keys(nodeSet).map(function(name) { return { name: name } }), links: Object.values(linksMap) }
+/* 清除桑基数据缓存（数据更新时调用） */
+function clearSankeyCache() {
+  _sankeyDataCache = {}
 }
 
 /* ========================================= */
@@ -440,4 +473,95 @@ function getRoleTypeByAllDynasties() {
     })
   })
   return { timeline: timeline, types: Array.from(allTypes), data: data }
+}
+
+/* ========================================= */
+/* 根据桑基节点筛选歌剧名列表 */
+/* node: { prefix: '行当', value: '净' } */
+/* ========================================= */
+
+function getOperaNamesBySankeyNode (node) {
+  var names = {}
+  var operas = DataStore.operaRoles
+  for (var oi = 0; oi < operas.length; oi++) {
+    var opera = operas[oi]
+    if (!Array.isArray(opera.roles)) continue
+    var roles = opera.roles
+    for (var i = 0; i < roles.length; i++) {
+      var role = roles[i]
+      var match = false
+      if (node.prefix === '行当' && role.role_type === node.value) match = true
+      if (node.prefix === '性别') {
+        var gv = node.value
+        if (gv === '男性' && role.gender === '男') match = true
+        if (gv === '女性' && role.gender === '女') match = true
+        if (gv === '未知' && (role.gender === '未知' || !role.gender)) match = true
+      }
+      if (node.prefix === '身份' && (role._identityCat || classifyIdentityV2(role.identity)) === '身份:' + node.value) match = true
+      if (node.prefix === '性格' && (role._personalityCat || classifyPersonalityV2(role.personality)) === '性格:' + node.value) match = true
+      if (node.prefix === '表演') {
+        var perf = role.performance_type || []
+        if (perf.indexOf(node.value) >= 0) match = true
+      }
+      if (node.prefix === '年龄') {
+        var ageLabel = role.age_stage || ''
+        if (ageLabel.indexOf(node.value) >= 0) match = true
+      }
+      if (match) { names[opera.opera_name || opera.opera] = true; break }
+    }
+  }
+  return Object.keys(names)
+}
+
+/* ========================================= */
+/* 根据主题关键词筛选歌剧名列表 */
+/* ========================================= */
+
+function getOperaNamesByKeyword (keyword) {
+  var names = {}
+  DataStore.operaThemes.forEach(function(item) {
+    var kws = item.theme_keywords || []
+    for (var i = 0; i < kws.length; i++) {
+      if (kws[i].word === keyword) {
+        names[item.opera_name || item.opera] = true
+        break
+      }
+    }
+  })
+  return Object.keys(names)
+}
+
+/* ========================================= */
+/* 获取指定剧目的角色行当列表（用于桑基图高亮） */
+/* ========================================= */
+
+function getRoleTypesByOpera (operaName) {
+  var entry = DataStore.operaRoles.find(function(item) { return (item.opera_name || item.opera) === operaName })
+  if (!entry || !Array.isArray(entry.roles)) return []
+  var types = {}
+  entry.roles.forEach(function(role) {
+    var rt = role.role_type || inferRoleType(role)
+    if (rt) types[rt] = (types[rt] || 0) + 1
+  })
+  return Object.keys(types)
+}
+
+/* ========================================= */
+/* 根据主题大类索引获取歌剧名列表 */
+/* ========================================= */
+
+function getOperaNamesByThemeCategory (catIndex) {
+  /* 使用 chartTheme.js 共享的 classifyThemeType */
+  var names = {}
+  DataStore.operaThemes.forEach(function(item) {
+    var kws = item.theme_keywords || []
+    for (var i = 0; i < kws.length; i++) {
+      var ci = classifyThemeType(kws[i].theme_type)
+      if (ci === catIndex) {
+        names[item.opera_name || item.opera] = true
+        break
+      }
+    }
+  })
+  return Object.keys(names)
 }

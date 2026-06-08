@@ -9,172 +9,16 @@
   var _selectedKeyword = null
   var _comboMode = 'word' // 'word' | 'category'
 
-  var CATEGORIES = [
-    { name: '伦理道德', color: '#C0392B' },
-    { name: '政治权谋', color: '#6C3483' },
-    { name: '战争军事', color: '#E67E22' },
-    { name: '家庭亲情', color: '#E84393' },
-    { name: '人物品格', color: '#27AE60' },
-    { name: '情节叙事', color: '#8D6E63' },
-    { name: '情感心理', color: '#2980B9' },
-    { name: '社会民生', color: '#17A589' },
-    { name: '宗教神怪', color: '#9B59B6' },
-    { name: '艺术审美', color: '#F39C12' }
-  ]
+  /* 使用 chartTheme.js 中的共享 THEME_CATEGORIES 和 classifyThemeType() */
+  var CATEGORIES = THEME_CATEGORIES
 
   var MAX_KEYWORDS_PER_CATEGORY = 18
 
-  function classifyThemeType (t) {
-    if (!t || t === 'undefined') return -1
-    if (
-      /^(战争|军事|谋略|武戏|兵法|将帅|战场|战役|军旅|战术|战事|武艺|武打|武勇|武|军纪|军令|军务|军阵|军旅|军中|军|兵|阵|剿|抗敌|边塞|边关|御敌|征战|征伐)/.test(
-        t
-      )
-    )
-      return 2
-    if (
-      /^(政治|权谋|朝堂|朝廷|君臣|官场|仕途|宫廷|帝王|权力|权术|权|君|皇|朝政|朝|政|臣|爵|宦|谏|诏|奏|赐)/.test(
-        t
-      )
-    )
-      return 1
-    if (
-      /^(人物品格|家庭伦理|忠义|忠孝|忠勇|忠烈|忠贞|忠奸|道德|价值|价值观|品格|品德|教化|气节|节|仁义|道义|孝|伦理|人格|德|礼法|礼教|礼|贞)/.test(
-        t
-      )
-    )
-      return 0
-    if (
-      /^(神怪|宗教|神异|因果|报应|天命|神|佛|鬼|冥|迷信|超自然|仙|魔|妖|僧|道|术)/.test(
-        t
-      )
-    )
-      return 8
-    if (/^(亲情|爱情|婚姻|家庭|婚恋|夫妻|父母|孝|恋|姻)/.test(t)) return 3
-    if (/^(人物|性格|品质|精神|气质|才能|志向|意愿|动机|才)/.test(t)) return 4
-    if (
-      /^(情节|冲突|叙事|剧情|戏剧|场景|事件|主线|核心|道具|线索|母题|悬念|转折)/.test(
-        t
-      )
-    )
-      return 5
-    if (/^(情感|命运|悲剧|心理|情绪|人生|生死|离合|悲欢)/.test(t)) return 6
-    if (
-      /^(社会|司法|公案|民生|正义|冤|官|世俗|民众|人间|罪犯|贪|讼|诉讼)/.test(t)
-    )
-      return 7
-    if (/^(艺术|风格|审美|表演|舞台|喜剧|意象|手法|戏曲)/.test(t)) return 9
-    if (
-      /(战争|军事|谋略|武戏|兵法|将帅|战场|军旅|武艺|武打|阵地|战局|战役)/.test(
-        t
-      )
-    )
-      return 2
-    if (
-      /(权谋|权术|朝堂|朝廷|君臣|官场|仕途|权力|政治|权斗|权位|权|帝王|皇)/.test(
-        t
-      )
-    )
-      return 1
-    if (
-      /(伦理|道德|忠义|忠孝|忠勇|忠烈|忠奸|教化|气节|节义|品格|品德|人格|德性|贞节|贞烈|孝道|道义|仁义|礼)/.test(
-        t
-      )
-    )
-      return 0
-    if (
-      /(神怪|神异|因果|报应|天命|宗教|神魔|神权|鬼|冥|妖|仙|佛|道|修行|斋|忏)/.test(
-        t
-      )
-    )
-      return 8
-    if (/(亲情|爱情|婚姻|婚恋|夫妻|家庭)/.test(t)) return 3
-    if (/(人物|性格|品质|精神|气质|才能|志向|动机)/.test(t)) return 4
-    if (/(冲突|情节|叙事|剧情|戏剧|场景|事件|主线|线索|悬念|转折)/.test(t))
-      return 5
-    if (/(情感|命运|悲剧|心理|情绪|人生|生死|离合)/.test(t)) return 6
-    if (/(社会|司法|公案|民生|正义|冤|世俗|民众|贪)/.test(t)) return 7
-    if (/(艺术|审美|表演|舞台|风格|意象|喜剧|戏曲)/.test(t)) return 9
-    if (/(复仇|报仇)/.test(t)) return 6
-    if (/(侠义|侠|义气)/.test(t)) return 0
-    if (/(智谋|计策|计|策|智斗)/.test(t)) return 2
-    if (/(功名|功业|建功)/.test(t)) return 1
-    if (/(情义|情谊|情意)/.test(t)) return 0
-    if (/(恩|怨|仇)/.test(t)) return 6
-    if (/(家国|爱国|报国)/.test(t)) return 0
-    if (/(英雄|气概|传奇)/.test(t)) return 4
-    if (/(民生|民怨|民间)/.test(t)) return 7
-    if (/(价值|主题|思想|观念)/.test(t)) return 0
-    if (/(功名|事业|抱负|人才)/.test(t)) return 1
-    if (/(世|民生|民主)/.test(t)) return 7
-    if (/(际遇|遭际|境遇)/.test(t)) return 6
-    if (/(身份|伪装|揭秘)/.test(t)) return 5
-    if (/(智|慧)/.test(t)) return 2
-    if (/(谋)/.test(t)) return 2
-    if (/(人际关系|交往|关系)/.test(t)) return 4
-    if (/(兴亡|兴衰)/.test(t)) return 1
-    if (/(时代背景|时代|时代主题|历史背景)/.test(t)) return 5
-    if (/(人性|人心)/.test(t)) return 4
-    if (/(行动|动作)/.test(t)) return 5
-    if (/(斗争|抗争|反抗)/.test(t)) return 1
-    if (/(反思|回忆|追忆|回顾|历史)/.test(t)) return 6
-    if (/(物|对象|饰品)/.test(t)) return 5
-    if (/(成长|转变|变化|转折)/.test(t)) return 4
-    if (/(讽刺|讽喻|批判|抨击)/.test(t)) return 7
-    if (/(牺牲|苦难|折磨|痛苦)/.test(t)) return 6
-    if (/(团圆|相聚)/.test(t)) return 3
-    if (/(误会|分歧|纠纷)/.test(t)) return 5
-    if (/(处境|困境|艰困)/.test(t)) return 6
-    if (/(矛盾|冲突|对立)/.test(t)) return 5
-    if (/(场面|情景|情境)/.test(t)) return 5
-    if (/(忠君|君臣|爵|禄|仕)/.test(t)) return 1
-    if (/(江湖|侠|豪)/.test(t)) return 0
-    if (/(牺牲|奉献)/.test(t)) return 0
-    if (/(生存|生活|生计)/.test(t)) return 7
-    if (/(人际|交往)/.test(t)) return 4
-    if (/(灾难|灾祸|灾害|苦难)/.test(t)) return 6
-    if (/(治国|治政|治理|治世)/.test(t)) return 1
-    if (/(惩恶|扬善|除恶|惩奸)/.test(t)) return 0
-    if (/(民俗|风俗|民间)/.test(t)) return 7
-    if (/(暴力|犯罪|罪恶)/.test(t)) return 7
-    if (/(女性|妇女|红颜)/.test(t)) return 3
-    if (/(正邪|善恶|对错)/.test(t)) return 0
-    if (/(人情|世故|世态)/.test(t)) return 7
-    if (/(清官|断案|案件|案情)/.test(t)) return 7
-    if (/(仪式|典礼|礼仪|庆贺|祝|颂)/.test(t)) return 9
-    if (/(主旨|主线|核心)/.test(t)) return 5
-    if (/(结局|收束|归宿|走向)/.test(t)) return 5
-    if (/(信物|宝物|道具|物件|器物)/.test(t)) return 5
-    if (/(人际|相处)/.test(t)) return 4
-    if (/(求贤|用人|人才|举荐|招贤)/.test(t)) return 1
-    if (/(和解|和议|议和|讲和)/.test(t)) return 5
-    if (/(信仰|宗教|迷信)/.test(t)) return 8
-    if (/(群像|群体|集体)/.test(t)) return 4
-    if (/(哲理|哲学|思辨)/.test(t)) return 0
-    if (/(情爱|爱恋|恋情)/.test(t)) return 3
-    if (/(策略|战略)/.test(t)) return 2
-    if (/(压迫|剥削|欺压)/.test(t)) return 7
-    if (/(公义|公道|公正)/.test(t)) return 7
-    if (/(文人|文士|文臣|雅集|风雅|文雅)/.test(t)) return 9
-    if (/(胜利|战胜|取胜|凯旋)/.test(t)) return 2
-    if (/(劝诫|规劝|劝谏)/.test(t)) return 0
-    if (/(宗室|皇族|皇亲)/.test(t)) return 1
-    if (/(冒险|历险|涉险)/.test(t)) return 5
-    if (/(疾病|伤病|病患)/.test(t)) return 7
-    if (/(友情|友谊)/.test(t)) return 4
-    if (/(吉祥|吉庆|祥瑞|祈福|颂|祝)/.test(t)) return 9
-    if (/(复国|复兴|复汉)/.test(t)) return 1
-    if (/(外交|邦交|出使)/.test(t)) return 1
-    if (/(科举|科场|仕进|功名|进士)/.test(t)) return 1
-    if (/(教育|教导|训诫|诲)/.test(t)) return 0
-    if (/(刑罚|刑|狱)/.test(t)) return 7
-    if (/(战乱|兵乱|离乱)/.test(t)) return 2
-    if (/(时局|局势|时势)/.test(t)) return 1
-    if (/(法理|法纪|法令|法治)/.test(t)) return 7
-    if (/(危机|危局)/.test(t)) return 5
-    if (/(盟|联|归附|归降|招降)/.test(t)) return 2
-    return -1
-  }
+  /* classifyThemeType 已统一在 chartTheme.js 中定义，此处通过闭包引用 */
+
+  var _localClassify = classifyThemeType; // 保持局部引用以避免全局查找
+
+  /* classifyThemeType 已统一在 chartTheme.js 中定义 */
 
   function buildAllData (dynasty) {
     /* 按朝代筛选有效剧目名 */
@@ -275,6 +119,7 @@
       instance.dispose()
       instance = null
     }
+    dom.innerHTML = ''
     var allData = buildAllData(dynasty)
     if (!allData.length) {
       instance = echarts.init(dom)
@@ -401,14 +246,31 @@
       instance.off('click').on('click', function (params) {
         if (!params || !params.data) return
         var d = params.data
+        /* 点击关键词（叶子节点） */
         if (d.name !== '主题结构' && (!d.children || !d.children.length)) {
           _selectedKeyword = d.name
           renderTopCombos(_selectedKeyword)
         }
+        /* 点击大类（有 children 的中间节点）→ 跳到综合分析 */
+        if (d.children && d.children.length && d.name !== '主题结构') {
+          var catIndex = -1
+          for (var ci = 0; ci < CATEGORIES.length; ci++) {
+            if (CATEGORIES[ci].name === d.name) { catIndex = ci; break }
+          }
+          if (catIndex >= 0) {
+            EventBus.emit('navigate:page', { pageId: 'overviewAnalysisPage', context: { themeCategory: catIndex } })
+          }
+        }
       })
 
       bindResize(instance)
-      renderTopCombos(null)
+      /* 检查是否有外部导航来的关键词高亮 */
+      if (typeof AppState !== 'undefined' && AppState.navigateTo && AppState.navigateTo.keyword) {
+        _selectedKeyword = AppState.navigateTo.keyword
+        renderTopCombos(_selectedKeyword)
+      } else {
+        renderTopCombos(null)
+      }
     }
 
     function renderTopCombos (keyword) {
@@ -440,7 +302,7 @@
       header += '<span>主题组合模式</span>'
       if (keyword) {
         header += '<span style="color:#ffd27f;font-weight:bold;">· "' + keyword + '"</span>'
-        header += '<span class="combo-clear" style="color:rgba(200,160,110,.7);cursor:pointer;font-size:11px;flex-shrink:0;" onclick="event.stopPropagation();window.__clearKeywordFilter&&window.__clearKeywordFilter()">X 清除</span>'
+        header += '<span class="combo-clear" style="color:#4a1510;cursor:pointer;font-size:11px;font-weight:700;flex-shrink:0;" onclick="event.stopPropagation();window.__clearKeywordFilter&&window.__clearKeywordFilter()">X 清除</span>'
       }
       header += '</div>'
 

@@ -44,6 +44,9 @@
           <h1>「戏韵万象」京剧数据可视分析</h1>
         </header>
 
+        <!-- 面包屑导航 -->
+        <div id="breadcrumbNav" class="breadcrumb-nav"></div>
+
         <!-- ========================= -->
         <!-- 整体预览（含时间轴） -->
         <!-- ========================= -->
@@ -53,63 +56,7 @@
           <!-- 时间轴（仅整体预览页面可见） -->
 
           <section class="timeline">
-            <div class="timeline-items">
-              <div class="timeline-node active" data-dynasty="全部">
-                <div class="dot"></div>
-                <h4>全部</h4>
-                <p>全剧目</p>
-              </div>
-              <div class="timeline-node" data-dynasty="春秋战国">
-                <div class="dot"></div>
-                <h4>春秋战国</h4>
-                <p>前770—前221</p>
-              </div>
-              <div class="timeline-node" data-dynasty="秦汉">
-                <div class="dot"></div>
-                <h4>秦汉</h4>
-                <p>前221—220</p>
-              </div>
-              <div class="timeline-node" data-dynasty="三国两晋">
-                <div class="dot"></div>
-                <h4>三国两晋</h4>
-                <p>220—420</p>
-              </div>
-              <div class="timeline-node" data-dynasty="隋唐五代">
-                <div class="dot"></div>
-                <h4>隋唐五代</h4>
-                <p>581—960</p>
-              </div>
-              <div class="timeline-node" data-dynasty="宋">
-                <div class="dot"></div>
-                <h4>宋</h4>
-                <p>960—1279</p>
-              </div>
-              <div class="timeline-node" data-dynasty="元">
-                <div class="dot"></div>
-                <h4>元</h4>
-                <p>1271—1368</p>
-              </div>
-              <div class="timeline-node" data-dynasty="明">
-                <div class="dot"></div>
-                <h4>明</h4>
-                <p>1368—1644</p>
-              </div>
-              <div class="timeline-node" data-dynasty="清">
-                <div class="dot"></div>
-                <h4>清</h4>
-                <p>1644—1912</p>
-              </div>
-              <div class="timeline-node" data-dynasty="近现代">
-                <div class="dot"></div>
-                <h4>近现代</h4>
-                <p>1912—至今</p>
-              </div>
-              <div class="timeline-node" data-dynasty="未识别">
-                <div class="dot"></div>
-                <h4>未识别</h4>
-                <p>未分类</p>
-              </div>
-            </div>
+            <div class="timeline-items"></div>
           </section>
 
           <section class="main overview-main">
@@ -162,8 +109,13 @@
                 <div class="panel-header-row">
                   <div class="section-title">剧本索引</div>
 
-                  <div class="index-search-box">
-                    <input id="indexSearchInput" type="text" placeholder="搜索剧目名称..." />
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div id="filterTagBar" class="filter-tag-bar-inline"></div>
+                    <button id="compareToggleBtn" class="compare-toggle-btn" onclick="toggleCompareMode()" title="勾选2-3部剧进行对比">◆ 对比模式</button>
+                    <span id="compareCount" class="compare-count"></span>
+                    <div class="index-search-box">
+                      <input id="indexSearchInput" type="text" placeholder="搜索剧目名称..." />
+                    </div>
                   </div>
                 </div>
 
@@ -275,65 +227,18 @@
         <section id="sankeyPage" class="page">
           <div class="subpage-container">
                     <section class="timeline">
-            <div class="timeline-items">
-              <div class="timeline-node active" data-dynasty="全部">
-                <div class="dot"></div>
-                <h4>全部</h4>
-                <p>全剧目</p>
-              </div>
-              <div class="timeline-node" data-dynasty="春秋战国">
-                <div class="dot"></div>
-                <h4>春秋战国</h4>
-                <p>前770—前221</p>
-              </div>
-              <div class="timeline-node" data-dynasty="秦汉">
-                <div class="dot"></div>
-                <h4>秦汉</h4>
-                <p>前221—220</p>
-              </div>
-              <div class="timeline-node" data-dynasty="三国两晋">
-                <div class="dot"></div>
-                <h4>三国两晋</h4>
-                <p>220—420</p>
-              </div>
-              <div class="timeline-node" data-dynasty="隋唐五代">
-                <div class="dot"></div>
-                <h4>隋唐五代</h4>
-                <p>581—960</p>
-              </div>
-              <div class="timeline-node" data-dynasty="宋">
-                <div class="dot"></div>
-                <h4>宋</h4>
-                <p>960—1279</p>
-              </div>
-              <div class="timeline-node" data-dynasty="元">
-                <div class="dot"></div>
-                <h4>元</h4>
-                <p>1271—1368</p>
-              </div>
-              <div class="timeline-node" data-dynasty="明">
-                <div class="dot"></div>
-                <h4>明</h4>
-                <p>1368—1644</p>
-              </div>
-              <div class="timeline-node" data-dynasty="清">
-                <div class="dot"></div>
-                <h4>清</h4>
-                <p>1644—1912</p>
-              </div>
-              <div class="timeline-node" data-dynasty="近现代">
-                <div class="dot"></div>
-                <h4>近现代</h4>
-                <p>1912—至今</p>
-              </div>
-              <div class="timeline-node" data-dynasty="未识别">
-                <div class="dot"></div>
-                <h4>未识别</h4>
-                <p>未分类</p>
-              </div>
-            </div>
+            <div class="timeline-items"></div>
           </section>
-          <div class="sankey-layout">
+          <div class="sankey-dim-row" id="sankeyDimRow">
+                <span style="color:#9F2B25;font-size:11px;font-family:var(--font-serif);font-weight:700;flex-shrink:0;">◆ 维度：</span>
+                <label class="dim-toggle active" data-dim="性别"><input type="checkbox" checked onchange="toggleSankeyDim()">性别</label>
+                <label class="dim-toggle active" data-dim="年龄"><input type="checkbox" checked onchange="toggleSankeyDim()">年龄</label>
+                <label class="dim-toggle active" data-dim="身份"><input type="checkbox" checked onchange="toggleSankeyDim()">身份</label>
+                <label class="dim-toggle active" data-dim="性格"><input type="checkbox" checked onchange="toggleSankeyDim()">性格</label>
+                <label class="dim-toggle active" data-dim="表演"><input type="checkbox" checked onchange="toggleSankeyDim()">表演</label>
+                <label class="dim-toggle active" data-dim="行当"><input type="checkbox" checked onchange="toggleSankeyDim()">行当</label>
+              </div>
+              <div class="sankey-layout">
               <div class="sankey-left">
                 <div id="sankeyCompare" class="chart-container-full"></div>
               </div>
@@ -357,63 +262,7 @@
         <section id="networkPage" class="page">
           <div class="subpage-container">
                     <section class="timeline">
-            <div class="timeline-items">
-              <div class="timeline-node active" data-dynasty="全部">
-                <div class="dot"></div>
-                <h4>全部</h4>
-                <p>全剧目</p>
-              </div>
-              <div class="timeline-node" data-dynasty="春秋战国">
-                <div class="dot"></div>
-                <h4>春秋战国</h4>
-                <p>前770—前221</p>
-              </div>
-              <div class="timeline-node" data-dynasty="秦汉">
-                <div class="dot"></div>
-                <h4>秦汉</h4>
-                <p>前221—220</p>
-              </div>
-              <div class="timeline-node" data-dynasty="三国两晋">
-                <div class="dot"></div>
-                <h4>三国两晋</h4>
-                <p>220—420</p>
-              </div>
-              <div class="timeline-node" data-dynasty="隋唐五代">
-                <div class="dot"></div>
-                <h4>隋唐五代</h4>
-                <p>581—960</p>
-              </div>
-              <div class="timeline-node" data-dynasty="宋">
-                <div class="dot"></div>
-                <h4>宋</h4>
-                <p>960—1279</p>
-              </div>
-              <div class="timeline-node" data-dynasty="元">
-                <div class="dot"></div>
-                <h4>元</h4>
-                <p>1271—1368</p>
-              </div>
-              <div class="timeline-node" data-dynasty="明">
-                <div class="dot"></div>
-                <h4>明</h4>
-                <p>1368—1644</p>
-              </div>
-              <div class="timeline-node" data-dynasty="清">
-                <div class="dot"></div>
-                <h4>清</h4>
-                <p>1644—1912</p>
-              </div>
-              <div class="timeline-node" data-dynasty="近现代">
-                <div class="dot"></div>
-                <h4>近现代</h4>
-                <p>1912—至今</p>
-              </div>
-              <div class="timeline-node" data-dynasty="未识别">
-                <div class="dot"></div>
-                <h4>未识别</h4>
-                <p>未分类</p>
-              </div>
-            </div>
+            <div class="timeline-items"></div>
           </section>
           <div class="network-top-row">
               <div class="network-controls" style="padding:0 0 4px 16px;gap:10px;justify-content:flex-start;">
@@ -450,63 +299,7 @@
         <section id="sunburstPage" class="page">
           <div class="subpage-container">
                     <section class="timeline">
-            <div class="timeline-items">
-              <div class="timeline-node active" data-dynasty="全部">
-                <div class="dot"></div>
-                <h4>全部</h4>
-                <p>全剧目</p>
-              </div>
-              <div class="timeline-node" data-dynasty="春秋战国">
-                <div class="dot"></div>
-                <h4>春秋战国</h4>
-                <p>前770—前221</p>
-              </div>
-              <div class="timeline-node" data-dynasty="秦汉">
-                <div class="dot"></div>
-                <h4>秦汉</h4>
-                <p>前221—220</p>
-              </div>
-              <div class="timeline-node" data-dynasty="三国两晋">
-                <div class="dot"></div>
-                <h4>三国两晋</h4>
-                <p>220—420</p>
-              </div>
-              <div class="timeline-node" data-dynasty="隋唐五代">
-                <div class="dot"></div>
-                <h4>隋唐五代</h4>
-                <p>581—960</p>
-              </div>
-              <div class="timeline-node" data-dynasty="宋">
-                <div class="dot"></div>
-                <h4>宋</h4>
-                <p>960—1279</p>
-              </div>
-              <div class="timeline-node" data-dynasty="元">
-                <div class="dot"></div>
-                <h4>元</h4>
-                <p>1271—1368</p>
-              </div>
-              <div class="timeline-node" data-dynasty="明">
-                <div class="dot"></div>
-                <h4>明</h4>
-                <p>1368—1644</p>
-              </div>
-              <div class="timeline-node" data-dynasty="清">
-                <div class="dot"></div>
-                <h4>清</h4>
-                <p>1644—1912</p>
-              </div>
-              <div class="timeline-node" data-dynasty="近现代">
-                <div class="dot"></div>
-                <h4>近现代</h4>
-                <p>1912—至今</p>
-              </div>
-              <div class="timeline-node" data-dynasty="未识别">
-                <div class="dot"></div>
-                <h4>未识别</h4>
-                <p>未分类</p>
-              </div>
-            </div>
+            <div class="timeline-items"></div>
           </section>
           <div class="sunburst-layout-full" style="flex:1;min-height:0;">
               <div id="themeSunburst" class="chart-container-full"></div>
@@ -521,67 +314,14 @@
         <section id="overviewAnalysisPage" class="page">
           <div class="subpage-container">
                     <section class="timeline">
-            <div class="timeline-items">
-              <div class="timeline-node active" data-dynasty="全部">
-                <div class="dot"></div>
-                <h4>全部</h4>
-                <p>全剧目</p>
-              </div>
-              <div class="timeline-node" data-dynasty="春秋战国">
-                <div class="dot"></div>
-                <h4>春秋战国</h4>
-                <p>前770—前221</p>
-              </div>
-              <div class="timeline-node" data-dynasty="秦汉">
-                <div class="dot"></div>
-                <h4>秦汉</h4>
-                <p>前221—220</p>
-              </div>
-              <div class="timeline-node" data-dynasty="三国两晋">
-                <div class="dot"></div>
-                <h4>三国两晋</h4>
-                <p>220—420</p>
-              </div>
-              <div class="timeline-node" data-dynasty="隋唐五代">
-                <div class="dot"></div>
-                <h4>隋唐五代</h4>
-                <p>581—960</p>
-              </div>
-              <div class="timeline-node" data-dynasty="宋">
-                <div class="dot"></div>
-                <h4>宋</h4>
-                <p>960—1279</p>
-              </div>
-              <div class="timeline-node" data-dynasty="元">
-                <div class="dot"></div>
-                <h4>元</h4>
-                <p>1271—1368</p>
-              </div>
-              <div class="timeline-node" data-dynasty="明">
-                <div class="dot"></div>
-                <h4>明</h4>
-                <p>1368—1644</p>
-              </div>
-              <div class="timeline-node" data-dynasty="清">
-                <div class="dot"></div>
-                <h4>清</h4>
-                <p>1644—1912</p>
-              </div>
-              <div class="timeline-node" data-dynasty="近现代">
-                <div class="dot"></div>
-                <h4>近现代</h4>
-                <p>1912—至今</p>
-              </div>
-              <div class="timeline-node" data-dynasty="未识别">
-                <div class="dot"></div>
-                <h4>未识别</h4>
-                <p>未分类</p>
-              </div>
-            </div>
+            <div class="timeline-items"></div>
           </section>
           <div class="analysis-grid-new">
               <div class="ana-panel ana-panel-wide">
-                <div class="section-title" style="margin-bottom:6px;">三者联动 · 角色关系 × 主题表达 × 叙事结构</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="section-title" style="margin-bottom:0;">三者联动 · 角色关系 × 主题表达 × 叙事结构</div>
+                  <span id="anaHighlightLabel" class="ana-highlight-label" style="display:none;"></span>
+                </div>
                 <div id="anaBubble" class="ana-chart"></div>
               </div>
               <div class="ana-panel">
@@ -631,6 +371,26 @@
         <script src="./js/charts/themeSunburst.js"></script>
         <script src="./js/charts/comprehensiveAnalysis.js"></script>
         <script src="./js/main.js"></script>
+      </div>
+    </div>
+
+    <!-- 剧本对比 Modal -->
+    <div id="compareModal" class="compare-modal">
+      <div class="compare-overlay" onclick="closeCompareModal()"></div>
+      <div class="compare-panel">
+        <div class="compare-header">
+          <span class="compare-title">◆ 剧本对比</span>
+          <span style="font-size:11px;color:rgba(242,217,186,.5);">点击剧目选择（最多3部）</span>
+          <div style="display:flex;gap:8px;">
+            <button class="compare-confirm-btn" onclick="confirmCompare()">◇ 确定对比</button>
+            <button class="compare-close-btn" onclick="closeCompareModal()">× 取消</button>
+          </div>
+        </div>
+        <div class="compare-cols">
+          <div class="compare-col"><div class="compare-col-title"></div><div class="compare-col-info"></div><div class="compare-stats"></div><div class="compare-graph"></div><div class="compare-themes"></div><div class="compare-line"></div></div>
+          <div class="compare-col"><div class="compare-col-title"></div><div class="compare-col-info"></div><div class="compare-stats"></div><div class="compare-graph"></div><div class="compare-themes"></div><div class="compare-line"></div></div>
+          <div class="compare-col"><div class="compare-col-title"></div><div class="compare-col-info"></div><div class="compare-stats"></div><div class="compare-graph"></div><div class="compare-themes"></div><div class="compare-line"></div></div>
+        </div>
       </div>
     </div>
   </body>

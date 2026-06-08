@@ -161,16 +161,38 @@ function renderCurrentOpera () {
   bindResize(instance)
 }
 
-function renderRelationNetwork (operaType, dynasty) {
+var _selectedOperaType = '全部'
+
+function renderRelationNetwork (operaType, dynasty, roleType) {
   if (operaType === undefined) operaType = '全部'
   if (dynasty === undefined) dynasty = '全部'
+  if (roleType === undefined) roleType = null
   _netDynasty = dynasty
+  _selectedOperaType = operaType
   var operas = DataStore.operaCompact || []
   /* 先按朝代筛选 */
   if (dynasty !== '全部') {
     operas = operas.filter(function(o) { return isOperaInDynasty(o.dynasty, dynasty) })
   }
   if (operaType !== '全部') operas = operas.filter(function(o) { return normalizeType(o.opera_type) === operaType })
+
+  /* 按行当筛选 */
+  if (roleType) {
+    var roleNames = {}
+    DataStore.operaRoles.forEach(function(opera) {
+      if (!Array.isArray(opera.roles)) return
+      for (var i = 0; i < opera.roles.length; i++) {
+        var rt = opera.roles[i].role_type
+        if (rt === roleType) {
+          roleNames[opera.opera_name || opera.opera] = true
+          break
+        }
+      }
+    })
+    var rn = Object.keys(roleNames)
+    operas = operas.filter(function(o) { return rn.indexOf(o.opera_name) >= 0 })
+  }
+
   currentOperaList = operas.filter(function(o) {
     var rel = getRelationsByOpera(o.opera_name)
     return Array.isArray(rel) && rel.length > 0
@@ -304,11 +326,26 @@ function renderStructureView (chart) {
       params.value.forEach(function (v, i) { h += '<div style="display:flex;justify-content:space-between;gap:20px;line-height:1.8;font-size:12px;"><span>' + indicator[i].name + '</span><span style="font-weight:bold;color:#ffd27f;">' + v + '</span></div>' })
       return h
     }},
-    legend: { type: 'scroll', bottom: 0, left: 'center', textStyle: { color: COLORS.legendText, fontSize: 14 }, pageTextStyle: { color: COLORS.legendText }, itemWidth: 10, itemHeight: 8, itemGap: 6 },
-    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#ffd27f', fontSize: 14 } }, splitArea: { areaStyle: { color: ['rgba(100,25,20,.45)', 'rgba(100,25,20,.35)'] } }, splitLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } }, axisLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } } },
+    legend: { top: 0, right: 0, orient: 'vertical', textStyle: { color: '#4a1510', fontSize: 15, fontWeight: 'bold' }, itemWidth: 18, itemHeight: 16, itemGap: 8 },
+    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#7A1F1F', fontSize: 14 } }, splitArea: { areaStyle: { color: ['transparent', 'transparent'] } }, splitLine: { lineStyle: { color: 'rgba(30,10,5,.6)', width: 1.5 } }, axisLine: { lineStyle: { color: 'rgba(30,10,5,.85)', width: 2 } } },
     series: [{ type: 'radar', data: metrics.map(function (m, i) { return { name: m.type, value: [m.avgDegree, m.avgDensity, m.avgComponents, m.avgEdgeCount], lineStyle: { color: palette[i % palette.length], width: 3 }, areaStyle: { color: palette[i % palette.length], opacity: 0.2 }, itemStyle: { color: palette[i % palette.length] }, symbol: 'circle', symbolSize: 6 } }) }]
   })
   bindResize(chart)
+
+  /* 选中剧种时高亮对应数据，弱化其余 */
+  if (_selectedOperaType && _selectedOperaType !== '全部') {
+    chart.dispatchAction({ type: 'downplay' })
+    chart.dispatchAction({ type: 'highlight', name: _selectedOperaType })
+  }
+
+  /* 雷达图点击 → 按剧种筛选左侧人物关系图 */
+  chart.off('click').on('click', function(params) {
+    if (params.name) {
+      renderRelationNetwork(params.name, _netDynasty)
+      var filter = document.getElementById('networkTypeFilter')
+      if (filter) filter.value = params.name
+    }
+  })
 }
 
 /* 2. 角色维度 — 雷达图（跨剧种对比，先算剧目再按剧种平均） */
@@ -366,11 +403,26 @@ function renderRoleView (chart) {
       params.value.forEach(function (v, i) { h += '<div style="display:flex;justify-content:space-between;gap:20px;line-height:1.8;font-size:12px;"><span>' + indicator[i].name + '</span><span style="font-weight:bold;color:#ffd27f;">' + v + '</span></div>' })
       return h
     }},
-    legend: { type: 'scroll', bottom: 0, left: 'center', textStyle: { color: COLORS.legendText, fontSize: 14 }, pageTextStyle: { color: COLORS.legendText }, itemWidth: 10, itemHeight: 8, itemGap: 6 },
-    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#ffd27f', fontSize: 14 } }, splitArea: { areaStyle: { color: ['rgba(100,25,20,.45)', 'rgba(100,25,20,.35)'] } }, splitLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } }, axisLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } } },
+    legend: { top: 0, right: 0, orient: 'vertical', textStyle: { color: '#4a1510', fontSize: 15, fontWeight: 'bold' }, itemWidth: 18, itemHeight: 16, itemGap: 8 },
+    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#7A1F1F', fontSize: 14 } }, splitArea: { areaStyle: { color: ['transparent', 'transparent'] } }, splitLine: { lineStyle: { color: 'rgba(30,10,5,.6)', width: 1.5 } }, axisLine: { lineStyle: { color: 'rgba(30,10,5,.85)', width: 2 } } },
     series: [{ type: 'radar', data: metrics.map(function (m, i) { return { name: m.type, value: [m.corePct, m.diversity, m.highImpPct], lineStyle: { color: palette[i % palette.length], width: 3 }, areaStyle: { color: palette[i % palette.length], opacity: 0.2 }, itemStyle: { color: palette[i % palette.length] }, symbol: 'circle', symbolSize: 6 } }) }]
   })
   bindResize(chart)
+
+  /* 选中剧种时高亮对应数据，弱化其余 */
+  if (_selectedOperaType && _selectedOperaType !== '全部') {
+    chart.dispatchAction({ type: 'downplay' })
+    chart.dispatchAction({ type: 'highlight', name: _selectedOperaType })
+  }
+
+  /* 雷达图点击 → 按剧种筛选左侧人物关系图 */
+  chart.off('click').on('click', function(params) {
+    if (params.name) {
+      renderRelationNetwork(params.name, _netDynasty)
+      var filter = document.getElementById('networkTypeFilter')
+      if (filter) filter.value = params.name
+    }
+  })
 }
 
 /* 3. 关系维度 — 雷达图（跨剧种对比，先算剧目再按剧种平均） */
@@ -430,11 +482,26 @@ function renderRelationView (chart) {
       params.value.forEach(function (v, i) { h += '<div style="display:flex;justify-content:space-between;gap:20px;line-height:1.8;font-size:12px;"><span>' + indicator[i].name + '</span><span style="font-weight:bold;color:#ffd27f;">' + v + '</span></div>' })
       return h
     }},
-    legend: { type: 'scroll', bottom: 0, left: 'center', textStyle: { color: COLORS.legendText, fontSize: 14 }, pageTextStyle: { color: COLORS.legendText }, itemWidth: 10, itemHeight: 8, itemGap: 6 },
-    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#ffd27f', fontSize: 14 } }, splitArea: { areaStyle: { color: ['rgba(100,25,20,.45)', 'rgba(100,25,20,.35)'] } }, splitLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } }, axisLine: { lineStyle: { color: 'rgba(255,220,180,.30)' } } },
+    legend: { top: 0, right: 0, orient: 'vertical', textStyle: { color: '#4a1510', fontSize: 15, fontWeight: 'bold' }, itemWidth: 18, itemHeight: 16, itemGap: 8 },
+    radar: { center: ['50%', '48%'], radius: '80%', indicator: indicator, name: { textStyle: { color: '#7A1F1F', fontSize: 14 } }, splitArea: { areaStyle: { color: ['transparent', 'transparent'] } }, splitLine: { lineStyle: { color: 'rgba(30,10,5,.6)', width: 1.5 } }, axisLine: { lineStyle: { color: 'rgba(30,10,5,.85)', width: 2 } } },
     series: [{ type: 'radar', data: metrics.map(function (m, i) { return { name: m.type, value: [m.posNegRatio, m.relRichness, m.avgIntensity], lineStyle: { color: palette[i % palette.length], width: 3 }, areaStyle: { color: palette[i % palette.length], opacity: 0.2 }, itemStyle: { color: palette[i % palette.length] }, symbol: 'circle', symbolSize: 6 } }) }]
   })
   bindResize(chart)
+
+  /* 选中剧种时高亮对应数据，弱化其余 */
+  if (_selectedOperaType && _selectedOperaType !== '全部') {
+    chart.dispatchAction({ type: 'downplay' })
+    chart.dispatchAction({ type: 'highlight', name: _selectedOperaType })
+  }
+
+  /* 雷达图点击 → 按剧种筛选左侧人物关系图 */
+  chart.off('click').on('click', function(params) {
+    if (params.name) {
+      renderRelationNetwork(params.name, _netDynasty)
+      var filter = document.getElementById('networkTypeFilter')
+      if (filter) filter.value = params.name
+    }
+  })
 }
 
 function prevOpera () {

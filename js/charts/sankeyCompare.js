@@ -9,6 +9,23 @@ let sankeyInstance = null
 let pieInstance = null
 let trendInstance = null
 
+/* ===== 桑基维度选择 ===== */
+var _sankeyDims = ['性别','年龄','身份','性格','表演','行当']
+
+function toggleSankeyDim() {
+  var labels = document.querySelectorAll('#sankeyDimRow .dim-toggle')
+  _sankeyDims = []
+  for (var i = 0; i < labels.length; i++) {
+    var cb = labels[i].querySelector('input')
+    labels[i].classList.toggle('active', cb && cb.checked)
+    if (cb && cb.checked) _sankeyDims.push(labels[i].dataset.dim)
+  }
+  if (_sankeyDims.length < 2) { _sankeyDims = ['性别','年龄','身份','性格','表演','行当']; return } // 至少2个维度
+  renderSankeyCompare(typeof currentDynasty !== 'undefined' ? currentDynasty : '全部')
+}
+
+window.toggleSankeyDim = toggleSankeyDim
+
 function renderSankeyCompare (dynasty = '全部') {
   renderSankey(dynasty)
   renderPie(dynasty)
@@ -21,13 +38,28 @@ function renderSankey (dynasty) {
   if (!dom) return
   if (sankeyInstance) { sankeyInstance.dispose(); sankeyInstance = null }
   sankeyInstance = echarts.init(dom)
-  const data = getSankeyData(dynasty)
+
+  /* 传入选中维度，getSankeyData 直接从源数据生成对应链 */
+  var selectedDims = typeof _sankeyDims !== 'undefined' ? _sankeyDims : ['性别','年龄','身份','性格','表演','行当']
+  const data = getSankeyData(dynasty, selectedDims)
   if (!data || !data.nodes.length) { sankeyInstance.setOption({ backgroundColor: 'transparent', ...emptyTitle('暂无数据') }); return }
+
+  /* 检查是否有高亮剧目模式 */
+  var highlightRoleTypes = []
+  if (typeof AppState !== 'undefined' && AppState.navigateTo && AppState.navigateTo.highlightRole) {
+    highlightRoleTypes = typeof getRoleTypesByOpera === 'function' ? getRoleTypesByOpera(AppState.navigateTo.operaName || '') : []
+  }
+
   const nodes = data.nodes.map(n => {
     const prefix = (n.name || '').split(':')[0]
     var warmColors = { '性别':'#A7372F','年龄':'#C9703A','身份':'#C9852A','性格':'#B57947','表演':'#A67B3E','行当':'#8F5A3A' }
     const color = warmColors[prefix] || FALLBACK
-    return { ...n, itemStyle: { color, borderColor: 'rgba(255,220,180,0.3)', borderWidth: 2, shadowBlur: 10, shadowColor: 'rgba(200,130,60,0.2)' } }
+    var isHighlighted = false
+    if (highlightRoleTypes.length && prefix === '行当') {
+      var nodeValue = (n.name || '').replace('行当:', '')
+      isHighlighted = highlightRoleTypes.indexOf(nodeValue) >= 0
+    }
+    return { ...n, itemStyle: { color: isHighlighted ? '#ffd27f' : color, borderColor: isHighlighted ? '#ffd27f' : 'rgba(255,220,180,0.3)', borderWidth: isHighlighted ? 3 : 2, shadowBlur: isHighlighted ? 20 : 10, shadowColor: isHighlighted ? 'rgba(255,210,127,0.6)' : 'rgba(200,130,60,0.2)' } }
   })
   var sankeyLinks = data.links
   var nodeValueMap = {}
@@ -54,6 +86,20 @@ function renderSankey (dynasty) {
       emphasis: { focus: 'adjacency', lineStyle: { opacity: 0.7 } },
       data: nodes, links: data.links
     }]
+  })
+  /* 桑基节点(行当层)点击 → 高亮饼图 + 面积图曲线 */
+  sankeyInstance.off('click').on('click', function(params) {
+    if (params.dataType === 'node' && params.name && params.name.indexOf('行当:') === 0) {
+      var roleType = params.name.replace('行当:', '')
+      if (pieInstance && !pieInstance.isDisposed()) {
+        pieInstance.dispatchAction({ type: 'downplay', seriesIndex: 0 })
+        pieInstance.dispatchAction({ type: 'highlight', seriesIndex: 0, name: roleType })
+      }
+      if (trendInstance && !trendInstance.isDisposed()) {
+        trendInstance.dispatchAction({ type: 'downplay' })
+        trendInstance.dispatchAction({ type: 'highlight', seriesName: roleType })
+      }
+    }
   })
   bindResize(sankeyInstance)
 }
@@ -84,6 +130,22 @@ function renderPie (dynasty) {
     }]
   })
   bindResize(pieInstance)
+
+  /* 饼图扇区点击 → 高亮面积图曲线 + 桑基图行当节点 */
+  pieInstance.off('click').on('click', function(params) {
+    if (params.name) {
+      /* 高亮堆叠面积图中对应行当的曲线 */
+      if (trendInstance && !trendInstance.isDisposed()) {
+        trendInstance.dispatchAction({ type: 'downplay' })
+        trendInstance.dispatchAction({ type: 'highlight', seriesName: params.name })
+      }
+      /* 高亮桑基图中对应行当的节点 */
+      if (sankeyInstance && !sankeyInstance.isDisposed()) {
+        sankeyInstance.dispatchAction({ type: 'downplay' })
+        sankeyInstance.dispatchAction({ type: 'highlight', name: '行当:' + params.name })
+      }
+    }
+  })
 }
 
 /* ===== 右下堆叠面积图 ===== */
@@ -156,6 +218,20 @@ function renderTrend () {
     }))
   })
   bindResize(trendInstance)
+
+  /* 面积图曲线点击 → 高亮桑基行当节点 + 饼图扇区 */
+  trendInstance.off('click').on('click', function(params) {
+    if (params.seriesName) {
+      if (sankeyInstance && !sankeyInstance.isDisposed()) {
+        sankeyInstance.dispatchAction({ type: 'downplay' })
+        sankeyInstance.dispatchAction({ type: 'highlight', name: '行当:' + params.seriesName })
+      }
+      if (pieInstance && !pieInstance.isDisposed()) {
+        pieInstance.dispatchAction({ type: 'downplay', seriesIndex: 0 })
+        pieInstance.dispatchAction({ type: 'highlight', seriesIndex: 0, name: params.seriesName })
+      }
+    }
+  })
 }
 window.renderSankeyCompare = renderSankeyCompare;
 })();

@@ -4,7 +4,8 @@
 
 .timeline{
   min-height:110px;
-  margin-bottom:8px;
+  margin-bottom:4px;
+  margin-top:0;
   background:
     linear-gradient(180deg, rgba(155,32,22,0.55) 0%, transparent 30%, transparent 70%, rgba(155,32,22,0.55) 100%),
     rgba(100,25,20,0.50);

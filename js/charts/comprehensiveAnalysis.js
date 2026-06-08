@@ -3,92 +3,9 @@ var bubbleChart = null, themeStageChart = null, emotionChart = null
 var _allData = null
 var _anaDynasty = '全部'
 
-var CATEGORIES = [
-  { name: '伦理道德', color: '#C0392B' },
-  { name: '政治权谋', color: '#6C3483' },
-  { name: '战争军事', color: '#E67E22' },
-  { name: '家庭亲情', color: '#E84393' },
-  { name: '人物品格', color: '#27AE60' },
-  { name: '情节叙事', color: '#8D6E63' },
-  { name: '情感心理', color: '#2980B9' },
-  { name: '社会民生', color: '#17A589' },
-  { name: '宗教神怪', color: '#9B59B6' },
-  { name: '艺术审美', color: '#F39C12' }
-]
+var CATEGORIES = THEME_CATEGORIES
 
-function classifyThemeType (t) {
-  if (!t || t === 'undefined') return -1
-  if (/^(战争|军事|谋略|武戏|兵法|将帅|战场|战役|军旅|战术|战事|武艺|武打|武勇|武|军纪|军令|军务|军阵|军旅|军中|军|兵|阵|剿|抗敌|边塞|边关|御敌|征战|征伐)/.test(t)) return 2
-  if (/^(政治|权谋|朝堂|朝廷|君臣|官场|仕途|宫廷|帝王|权力|权术|权|君|皇|朝政|朝|政|臣|爵|宦|谏|诏|奏|赐)/.test(t)) return 1
-  if (/^(人物品格|家庭伦理|忠义|忠孝|忠勇|忠烈|忠贞|忠奸|道德|价值|价值观|品格|品德|教化|气节|节|仁义|道义|孝|伦理|人格|德|礼法|礼教|礼|贞)/.test(t)) return 0
-  if (/^(神怪|宗教|神异|因果|报应|天命|神|佛|鬼|冥|迷信|超自然|仙|魔|妖|僧|道|术)/.test(t)) return 8
-  if (/^(亲情|爱情|婚姻|家庭|婚恋|夫妻|父母|孝|恋|姻)/.test(t)) return 3
-  if (/^(人物|性格|品质|精神|气质|才能|志向|意愿|动机|才)/.test(t)) return 4
-  if (/^(情节|冲突|叙事|剧情|戏剧|场景|事件|主线|核心|道具|线索|母题|悬念|转折)/.test(t)) return 5
-  if (/^(情感|命运|悲剧|心理|情绪|人生|生死|离合|悲欢)/.test(t)) return 6
-  if (/^(社会|司法|公案|民生|正义|冤|官|世俗|民众|人间|罪犯|贪|讼|诉讼)/.test(t)) return 7
-  if (/^(艺术|风格|审美|表演|舞台|喜剧|意象|手法|戏曲)/.test(t)) return 9
-  if (/(战争|军事|谋略|武戏|兵法|将帅|战场|军旅|武艺|武打|阵地|战局|战役)/.test(t)) return 2
-  if (/(权谋|权术|朝堂|朝廷|君臣|官场|仕途|权力|政治|权斗|权位|权|帝王|皇)/.test(t)) return 1
-  if (/(伦理|道德|忠义|忠孝|忠勇|忠烈|忠奸|教化|气节|节义|品格|品德|人格|德性|贞节|贞烈|孝道|道义|仁义|礼)/.test(t)) return 0
-  if (/(神怪|神异|因果|报应|天命|宗教|神魔|神权|鬼|冥|妖|仙|佛|道|修行|斋|忏)/.test(t)) return 8
-  if (/(亲情|爱情|婚姻|婚恋|夫妻|家庭)/.test(t)) return 3
-  if (/(人物|性格|品质|精神|气质|才能|志向|动机)/.test(t)) return 4
-  if (/(冲突|情节|叙事|剧情|戏剧|场景|事件|主线|线索|悬念|转折)/.test(t)) return 5
-  if (/(情感|命运|悲剧|心理|情绪|人生|生死|离合)/.test(t)) return 6
-  if (/(社会|司法|公案|民生|正义|冤|世俗|民众|贪)/.test(t)) return 7
-  if (/(艺术|审美|表演|舞台|风格|意象|喜剧|戏曲)/.test(t)) return 9
-  if (/(复仇|报仇)/.test(t)) return 6
-  if (/(侠义|侠|义气)/.test(t)) return 0
-  if (/(智谋|计策|计|策|智斗)/.test(t)) return 2
-  if (/(功名|功业|建功)/.test(t)) return 1
-  if (/(情义|情谊|情意)/.test(t)) return 0
-  if (/(恩|怨|仇)/.test(t)) return 6
-  if (/(家国|爱国|报国)/.test(t)) return 0
-  if (/(英雄|气概|传奇)/.test(t)) return 4
-  if (/(民生|民怨|民间)/.test(t)) return 7
-  if (/(价值|主题|思想|观念)/.test(t)) return 0
-  if (/(功名|事业|抱负|人才)/.test(t)) return 1
-  if (/(世|民生|民主)/.test(t)) return 7
-  if (/(际遇|遭际|境遇)/.test(t)) return 6
-  if (/(身份|伪装|揭秘)/.test(t)) return 5
-  if (/(智|慧)/.test(t)) return 2
-  if (/(谋)/.test(t)) return 2
-  if (/(人际关系|交往|关系)/.test(t)) return 4
-  if (/(兴亡|兴衰)/.test(t)) return 1
-  if (/(时代背景|时代|时代主题|历史背景)/.test(t)) return 5
-  if (/(人性|人心)/.test(t)) return 4
-  if (/(行动|动作)/.test(t)) return 5
-  if (/(斗争|抗争|反抗)/.test(t)) return 1
-  if (/(反思|回忆|追忆|回顾|历史)/.test(t)) return 6
-  if (/(物|对象|饰品)/.test(t)) return 5
-  if (/(成长|转变|变化|转折)/.test(t)) return 4
-  if (/(讽刺|讽喻|批判|抨击)/.test(t)) return 7
-  if (/(牺牲|苦难|折磨|痛苦)/.test(t)) return 6
-  if (/(团圆|相聚)/.test(t)) return 3
-  if (/(误会|分歧|纠纷)/.test(t)) return 5
-  if (/(处境|困境|艰困)/.test(t)) return 6
-  if (/(矛盾|冲突|对立)/.test(t)) return 5
-  if (/(场面|情景|情境)/.test(t)) return 5
-  if (/(忠君|君臣|爵|禄|仕)/.test(t)) return 1
-  if (/(江湖|侠|豪)/.test(t)) return 0
-  if (/(牺牲|奉献)/.test(t)) return 0
-  if (/(生存|生活|生计)/.test(t)) return 7
-  if (/(人际|交往)/.test(t)) return 4
-  if (/(灾难|灾祸|灾害|苦难)/.test(t)) return 6
-  if (/(治国|治政|治理|治世)/.test(t)) return 1
-  if (/(惩恶|扬善|除恶|惩奸)/.test(t)) return 0
-  if (/(民俗|风俗|民间)/.test(t)) return 7
-  if (/(暴力|犯罪|罪恶)/.test(t)) return 7
-  if (/(女性|妇女|红颜)/.test(t)) return 3
-  if (/(正邪|善恶|对错)/.test(t)) return 0
-  if (/(人情|世故|世态)/.test(t)) return 7
-  if (/(清官|断案|案件|案情)/.test(t)) return 7
-  if (/(仪式|典礼|礼仪|庆贺|祝|颂)/.test(t)) return 9
-  if (/(主旨|主线|核心)/.test(t)) return 5
-  if (/(结局|收束|归宿|走向)/.test(t)) return 5
-  return -1
-}
+/* classifyThemeType() uses shared version from chartTheme.js */
 
 var _cachedDynasty = null
 function computeData (dynasty) {
@@ -173,7 +90,7 @@ function computeData (dynasty) {
   return result
 }
 
-function renderBubble(dynasty) {
+function renderBubble(dynasty, highlightName) {
   if (dynasty === undefined) dynasty = '全部'
   var dom = document.getElementById('anaBubble')
   if (!dom) return
@@ -194,10 +111,44 @@ function renderBubble(dynasty) {
       { type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, minSpan: 5 }
     ],
     series: ['渐强高潮型', '波浪渐进型', '跌宕起伏型', '先紧后松型', '平稳推进型'].map(function(t) {
-      return { name: t, type: 'scatter', symbolSize: function(val, params) { var v = (params && params.data && params.data.themeDiversity) || (val && val[2]) || 3; return Math.max(3, Math.min(50, (v - 1) * 5 + 4)) }, data: allData.filter(function(d) { return d.cluster === t }).map(function(d) { return { value: [d.avgConflict, d.totalNodes, d.themeDiversity || 3], name: d.name, type: d.type, cluster: d.cluster, totalNodes: d.totalNodes, themeDiversity: d.themeDiversity, roleRichness: d.roleRichness, avgConflict: d.avgConflict, eventCount: d.eventCount } }), itemStyle: { color: clusterColors[t] || '#8a7a6a', shadowBlur: 6, shadowColor: 'rgba(255,200,100,0.15)' }, emphasis: { label: { show: true, color: '#ffd27f', fontSize: 12, fontFamily: FONT_DISPLAY }, itemStyle: { shadowBlur: 12, shadowColor: 'rgba(255,200,100,0.35)' } } }
-    })
+      return { name: t, type: 'scatter', symbolSize: function(val, params) { var v = (params && params.data && params.data.themeDiversity) || (val && val[2]) || 3; return Math.max(3, Math.min(50, (v - 1) * 5 + 4)) }, data: allData.filter(function(d) { return d.cluster === t }).map(function(d) { return { value: [d.avgConflict, d.totalNodes, d.themeDiversity || 3], name: d.name, type: d.type, cluster: d.cluster, totalNodes: d.totalNodes, themeDiversity: d.themeDiversity, roleRichness: d.roleRichness, avgConflict: d.avgConflict, eventCount: d.eventCount, catIndices: d.catIndices } }), itemStyle: { color: clusterColors[t] || '#8a7a6a', shadowBlur: 6, shadowColor: 'rgba(255,200,100,0.15)' }, emphasis: { label: { show: true, color: '#ffd27f', fontSize: 12, fontFamily: FONT_DISPLAY }, itemStyle: { shadowBlur: 12, shadowColor: 'rgba(255,200,100,0.35)' } } }
+    }).concat(highlightName ? [function() {
+      /* 找匹配的高亮数据点 */
+      for (var fi = 0; fi < allData.length; fi++) {
+        if (allData[fi].name === highlightName) {
+          var hd = allData[fi]
+          return { name: '定位剧目', type: 'scatter', z: 10,
+            data: [{ value: [hd.avgConflict, hd.totalNodes, hd.themeDiversity || 3], name: hd.name, type: hd.type, cluster: hd.cluster, totalNodes: hd.totalNodes, themeDiversity: hd.themeDiversity, roleRichness: hd.roleRichness, avgConflict: hd.avgConflict, eventCount: hd.eventCount, catIndices: hd.catIndices }],
+            symbolSize: 60, symbol: 'pin',
+            itemStyle: { color: '#ffd27f', borderColor: '#9F2B25', borderWidth: 3, shadowBlur: 30, shadowColor: 'rgba(255,210,127,.8)' },
+            label: { show: true, position: 'top', color: '#ffd27f', fontSize: 14, fontFamily: FONT_DISPLAY, fontWeight: 'bold', formatter: function(p) { return p.name }, distance: 10 },
+            emphasis: { itemStyle: { shadowBlur: 40, shadowColor: 'rgba(255,210,127,1)' } }
+          }
+        }
+      }
+      return null
+    }()] : []).filter(Boolean)
   })
   bindResize(bubbleChart)
+
+  /* 气泡点击 → 跳转剧目详情 + 联动高亮热力图 */
+  bubbleChart.off('click').on('click', function(params) {
+    if (params.data && params.data.name) {
+      EventBus.emit('navigate:opera', { operaName: params.data.name })
+      /* 高亮热力图中该剧目涉及的主题类别行 */
+      if (themeStageChart && !themeStageChart.isDisposed() && params.data.catIndices) {
+        themeStageChart.dispatchAction({ type: 'downplay' })
+        var catIdx = params.data.catIndices
+        var opt = themeStageChart.getOption()
+        var heatData = (opt.series && opt.series[0] && opt.series[0].data) || []
+        for (var hi = 0; hi < heatData.length; hi++) {
+          if (catIdx.indexOf(heatData[hi].value[1]) >= 0) {
+            themeStageChart.dispatchAction({ type: 'highlight', seriesIndex: 0, dataIndex: hi })
+          }
+        }
+      }
+    }
+  })
 }
 
 function renderThemeStage(dynasty) {
@@ -338,6 +289,26 @@ function renderThemeStage(dynasty) {
     })
   }
   bindResize(themeStageChart)
+
+  /* 热力图点击 → 高亮气泡图中对应主题类别的剧目 */
+  themeStageChart.off('click').on('click', function(params) {
+    if (!params.value) return
+    var catIdx = params.value[1] // y-axis = theme category index
+    if (catIdx === undefined) return
+    if (bubbleChart && !bubbleChart.isDisposed()) {
+      bubbleChart.dispatchAction({ type: 'downplay' })
+      var opt = bubbleChart.getOption()
+      var allSeries = opt.series || []
+      for (var si = 0; si < allSeries.length; si++) {
+        var data = allSeries[si].data || []
+        for (var di = 0; di < data.length; di++) {
+          if (data[di] && data[di].catIndices && data[di].catIndices.indexOf(catIdx) >= 0) {
+            bubbleChart.dispatchAction({ type: 'highlight', seriesIndex: si, dataIndex: di })
+          }
+        }
+      }
+    }
+  })
 }
 
 function renderEmotionEvolution(dynasty) {
@@ -376,9 +347,45 @@ function renderEmotionEvolution(dynasty) {
 function renderComprehensiveAnalysis(dynasty) {
   if (dynasty === undefined) dynasty = '全部'
   _anaDynasty = dynasty
-  renderBubble(dynasty)
+
+  /* 检查是否有 themeCategory 筛选参数 */
+  var themeCatFilter = null
+  var highlightOperaName = null
+  if (typeof AppState !== 'undefined' && AppState.navigateTo) {
+    if (AppState.navigateTo.themeCategory !== undefined) {
+      themeCatFilter = AppState.navigateTo.themeCategory
+    }
+    if (AppState.navigateTo.highlightOpera) {
+      highlightOperaName = AppState.navigateTo.highlightOpera
+    }
+  }
+
+  /* 如果有主题大类筛选，过滤 computeData 结果 */
+  if (themeCatFilter !== null && themeCatFilter !== undefined && typeof themeCatFilter === 'number') {
+    var allData = computeData(dynasty)
+    var filtered = allData.filter(function(d) { return d.catIndices.indexOf(themeCatFilter) >= 0 })
+    _allData = filtered
+  }
+
+  renderBubble(dynasty, highlightOperaName)
   renderThemeStage(dynasty)
   renderEmotionEvolution(dynasty)
+
+  /* 显示/隐藏高亮剧目标签 */
+  var label = document.getElementById('anaHighlightLabel')
+  if (label) {
+    if (highlightOperaName) {
+      label.textContent = '◆ ' + highlightOperaName
+      label.style.display = 'inline-block'
+    } else {
+      label.style.display = 'none'
+    }
+  }
+
+  /* 清除主题筛选数据缓存，让下次正常渲染 */
+  if (themeCatFilter !== null && themeCatFilter !== undefined) {
+    _allData = null
+  }
 }
 
 setTimeout(function() {
