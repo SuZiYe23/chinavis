@@ -8,6 +8,13 @@
   flex-shrink:0;
 }
 
+.opera-overview-card{
+  overflow-y:auto;
+  flex:1;
+  min-height:0;
+  padding-right:4px;
+}
+
 /* ========================================= */
 /* 剧目概览卡 */
 /* ========================================= */
